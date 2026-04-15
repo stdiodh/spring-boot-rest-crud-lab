@@ -1,6 +1,6 @@
 # Spring Boot REST CRUD Lab
 
-> A&I 백엔드 커리큘럼 13주차 실습용 토픽 레포입니다.
+> Spring Boot 기반 REST CRUD 연습 레포입니다.
 
 ## 브랜치 안내
 
@@ -10,10 +10,16 @@
 학생은 반드시 `implementation` 브랜치에서 시작합니다.
 
 ```bash
-git clone -b implementation https://github.com/stdiodh/spring-boot-rest-crud-lab.git week13-rest-crud
-cd week13-rest-crud
+git clone -b implementation https://github.com/stdiodh/spring-boot-rest-crud-lab.git
+cd spring-boot-rest-crud-lab
 git checkout -b feat/<이름>
 ```
+
+## 이론 문서
+
+실습에 필요한 용어와 이론은 아래 문서에 정리합니다.
+
+- [REST API Theory Notes](./docs/rest-api-theory.md)
 
 ## 학습 목표
 
