@@ -1,3 +1,9 @@
 spring:
   application:
     name: spring-boot-rest-crud-lab
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+    operations-sorter: method
+  default-produces-media-type: application/json

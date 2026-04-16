@@ -1,13 +1,26 @@
 # Spring Boot REST CRUD Lab
 
-> Spring Boot 기반 REST CRUD 연습 레포입니다.
+> 요청이 들어오고, Service가 처리하고, 메모리에 저장한 뒤, 응답 DTO로 돌려주는 가장 기본적인 백엔드 흐름을 익히는 실습 레포입니다.
 
-## 브랜치 안내
+## 이 시퀀스에서 무엇을 배우나요
 
-- `implementation`: 학생 실습용 starter
-- `answer`: 수업 후 공개되는 완성본
+이번 실습은 DB나 보안으로 넘어가기 전,
+백엔드가 어떻게 요청을 받고 응답을 돌려주는지 가장 단순한 구조로 먼저 익히는 단계입니다.
 
-학생은 반드시 `implementation` 브랜치에서 시작합니다.
+이번 레포에서는 아래 흐름에만 집중합니다.
+
+1. `POST /posts`로 생성 요청을 보냅니다.
+2. `GET /posts`로 전체 목록을 조회합니다.
+3. `GET /posts/{id}`로 단건을 조회합니다.
+4. Controller와 Service의 역할 차이를 설명합니다.
+5. 메모리 저장이라서 서버 재시작 후 데이터가 사라지는 이유를 설명합니다.
+
+## 브랜치 사용 방법
+
+- `implementation`: 학생 실습용 starter 브랜치
+- `answer`: 비교용 정답 브랜치
+
+학생은 반드시 `implementation`에서 시작합니다.
 
 ```bash
 git clone -b implementation https://github.com/stdiodh/spring-boot-rest-crud-lab.git
@@ -15,50 +28,60 @@ cd spring-boot-rest-crud-lab
 git checkout -b feat/<이름>
 ```
 
-## 이론 문서
+정답 비교가 필요할 때는 아래 흐름을 사용합니다.
 
-실습에 필요한 용어와 이론은 아래 문서에 정리합니다.
+```bash
+git fetch origin
+git diff implementation..answer
+```
 
-- [REST API Theory Notes](./docs/rest-api-theory.md)
+## 문서 안내
 
-## 학습 목표
+- [이론 문서](./docs/theory.md)
+- [구현 안내](./docs/implementation.md)
+- [정답 가이드](./docs/answer-guide.md)
+- [체크리스트](./docs/checklist.md)
+- [제공 자료 안내](./docs/assets.md)
 
-- REST API와 CRUD의 기본 흐름을 이해합니다.
-- Controller -> Service -> Response 흐름을 직접 구현합니다.
-- 요청 DTO와 응답 DTO를 왜 나누는지 감을 잡습니다.
+## 파일을 어떻게 보면 좋나요
 
-## 이번 주 직접 구현 범위
+실습은 아래 순서로 보는 것을 권장합니다.
 
-- `GET /idols`
-- `GET /idols/{id}`
-- `POST /idols`
-- `PUT /idols/{id}`
-- `DELETE /idols/{id}`
-- Controller에서 Service를 호출하는 코드
-- Service에서 메모리 리스트를 다루는 코드
+1. `docs/theory.md`에서 왜 이 흐름을 배우는지 먼저 읽습니다.
+2. `docs/implementation.md`에서 오늘 구현 순서를 확인합니다.
+3. 아래 핵심 파일을 순서대로 엽니다.
 
-## 미리 제공된 코드
+- `src/main/kotlin/com/andi/rest_crud/dto/PostCreateRequest.kt`
+- `src/main/kotlin/com/andi/rest_crud/dto/PostResponse.kt`
+- `src/main/kotlin/com/andi/rest_crud/model/Post.kt`
+- `src/main/kotlin/com/andi/rest_crud/repository/PostMemoryRepository.kt`
+- `src/main/kotlin/com/andi/rest_crud/service/PostService.kt`
+- `src/main/kotlin/com/andi/rest_crud/controller/PostController.kt`
 
-- Spring Boot 프로젝트 설정
-- DTO / 모델 클래스 기본 구조
-- Validation 어노테이션
-- 테스트용 기본 클래스
+완성본 흐름은 `answer` 브랜치 코드와 `docs/answer-guide.md`를 함께 보면 빠르게 확인할 수 있습니다.
 
-## TODO 위치
+## 미리 제공되는 것
 
-- `src/main/kotlin/com/andi/rest_crud/controller/IdolController.kt`
-- `src/main/kotlin/com/andi/rest_crud/service/IdolService.kt`
+- Kotlin + Spring Boot 프로젝트 기본 설정
+- Swagger UI 진입 설정
+- 패키지 구조와 메인 애플리케이션 클래스
+- 실행용 기본 설정
+- 테스트 기본 클래스
 
-코드에서 아래 키워드를 검색하면 빠르게 찾을 수 있습니다.
-
-- `TODO(A&I)`
-- `HINT(A&I)`
-- `CHECK(A&I)`
+학생은 핵심 흐름만 직접 구현합니다.
 
 ## 실행 방법
 
+애플리케이션 실행:
+
 ```bash
 ./gradlew bootRun
+```
+
+Swagger UI 확인:
+
+```text
+http://localhost:8080/swagger
 ```
 
 테스트 실행:
@@ -67,19 +90,12 @@ git checkout -b feat/<이름>
 ./gradlew test
 ```
 
-## 체크 포인트
+## 이번 실습에서 직접 구현할 범위
 
-- Controller가 직접 비즈니스 로직을 처리하지 않는지 확인합니다.
-- Service가 요청을 받아 데이터를 가공하는 흐름을 설명할 수 있어야 합니다.
-- 서버를 재시작하면 데이터가 사라지는 이유를 설명할 수 있어야 합니다.
+- 생성 요청 DTO와 응답 DTO의 역할 이해
+- 메모리 저장용 `PostMemoryRepository` 흐름 이해
+- `PostService.create()`, `getAll()`, `getById()` 구현
+- `PostController`에서 API 연결
+- Swagger에서 POST / GET 직접 실행
 
-## 정답 브랜치 안내
-
-정답은 수업 종료 후 `answer` 브랜치로 공개됩니다.
-
-비교가 필요하면 아래 명령을 사용할 수 있습니다.
-
-```bash
-git fetch origin
-git diff implementation..answer
-```
+이번 시퀀스에서는 DB, JPA, Validation, Security를 붙이지 않습니다.
