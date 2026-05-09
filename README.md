@@ -1,6 +1,6 @@
 # Spring Boot REST CRUD Lab
 
-이 브랜치는 `01-implementation` starter입니다.  
+이 브랜치는 `01-implementation` starter입니다.
 DB나 보안으로 넘어가기 전에 요청이 들어오고, Service가 처리하고, 메모리에 저장한 뒤, 응답 DTO로 돌아가는 가장 기본적인 백엔드 흐름을 익힙니다.
 
 ## 이번 시퀀스에서 다루는 것
@@ -16,11 +16,11 @@ DB나 보안으로 넘어가기 전에 요청이 들어오고, Service가 처리
 
 - [이론 문서](./docs/theory.md)
 - [구현 안내](./docs/implementation.md)
-- [정답 비교 가이드](./docs/answer-guide.md)
+- [참고 구현 비교 가이드](./docs/answer-guide.md)
 - [체크리스트](./docs/checklist.md)
 - [제공 자료 안내](./docs/assets.md)
 
-## 학생이 직접 구현하는 핵심 파일
+## 실습에서 직접 구현하는 핵심 파일
 
 - `src/main/kotlin/com/andi/rest_crud/dto/PostResponse.kt`
 - `src/main/kotlin/com/andi/rest_crud/repository/PostMemoryRepository.kt`
@@ -48,4 +48,4 @@ Swagger UI:
 http://localhost:8080/swagger
 ```
 
-정답 비교는 수업 후 `01-answer` 브랜치에서 합니다.
+수업 후에는 `01-answer` 브랜치에서 참고 구현과 비교합니다.

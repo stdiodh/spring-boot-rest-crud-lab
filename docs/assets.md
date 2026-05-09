@@ -10,7 +10,7 @@
 | 테스트 기본 클래스 | 최소 실행 검증을 바로 할 수 있게 하기 위해 |
 | 실행용 `application.yaml` | 앱 이름과 Swagger 경로를 단순하게 유지하기 위해 |
 
-## 학생이 직접 구현하는 것
+## 실습에서 직접 구현하는 것
 
 - `PostResponse` 변환 흐름
 - `PostMemoryRepository` 저장 / 조회 흐름
@@ -19,7 +19,7 @@
 - `PostService.getById()`
 - `PostController` API 연결
 
-## 학생이 직접 작성하지 않는 범위
+## 실습에서 직접 작성하지 않는 범위
 
 - Validation
 - DB, JPA

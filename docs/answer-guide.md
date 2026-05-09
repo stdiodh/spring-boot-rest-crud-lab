@@ -1,9 +1,9 @@
-# 요청-응답과 메모리 CRUD 정답 비교 가이드
+# 요청-응답과 메모리 CRUD 참고 구현 비교 가이드
 
-이 브랜치는 starter이므로 정답 코드를 그대로 싣지 않습니다.  
-완성된 비교 기준은 `01-answer` 브랜치에서 확인합니다.
+이 브랜치는 starter이므로 참고 구현를 그대로 싣지 않습니다.
+완성된 흐름은 `01-answer` 브랜치에서 확인합니다.
 
-## 정답 브랜치에서 비교할 파일
+## 참고 구현 브랜치에서 비교할 파일
 
 - `PostResponse.kt`
 - `PostMemoryRepository.kt`
@@ -18,7 +18,7 @@
 - `PostController`가 직접 저장하지 않고 Service만 호출하는가
 - Swagger에서 POST / GET 흐름이 실행되는가
 
-## 정답 비교 명령
+## 참고 구현 비교 명령
 
 ```bash
 git fetch origin

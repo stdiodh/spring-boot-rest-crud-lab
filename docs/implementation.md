@@ -2,7 +2,7 @@
 
 이번 실습은 요청이 Controller로 들어오고, Service를 지나, 메모리 저장소에 저장된 뒤, 응답 DTO로 돌아오는 흐름을 직접 완성하는 단계입니다.
 
-## 학생이 완성할 흐름
+## 실습에서 완성할 흐름
 
 1. `POST /posts` 요청을 보내 새 글을 만듭니다.
 2. `GET /posts`로 전체 목록을 확인합니다.
@@ -80,6 +80,6 @@ fun from(post: Post): PostResponse = PostResponse(
 http://localhost:8080/swagger
 ```
 
-## 정답 비교
+## 참고 구현 비교
 
 수업 후 `01-answer` 브랜치에서 완성 코드와 비교합니다.
