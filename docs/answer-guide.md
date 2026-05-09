@@ -1,4 +1,4 @@
-# 요청-응답과 메모리 CRUD 정답 가이드
+# 요청-응답과 메모리 CRUD 참고 구현 가이드
 
 ## 빠른 흐름 정리
 
@@ -43,21 +43,21 @@
 ]
 ```
 
-## 파일별 핵심 정답 포인트
+## 파일별 핵심 참고 구현 포인트
 
 - `PostResponse.kt`: `PostResponse.from(post)`에서 `Post` 값을 응답 DTO로 옮깁니다.
 - `PostMemoryRepository.kt`: `save()`, `findAll()`, `findById()`로 메모리 저장소 흐름을 완성합니다.
 - `PostService.kt`: request -> Post -> repository -> response 흐름을 연결합니다.
 - `PostController.kt`: `POST /posts`, `GET /posts`, `GET /posts/{id}`를 Service에 연결합니다.
 
-## 강사용 빠른 점검 포인트
+## 리뷰용 빠른 점검 포인트
 
 - Controller가 직접 저장하지 않는가
 - Service가 request -> 저장 -> response 흐름을 묶고 있는가
 - 메모리 저장소가 DB 대신 임시 저장소 역할을 하는가
 - Swagger에서 POST / GET이 실제로 실행되는가
 
-## 정답 비교 명령
+## 참고 구현 비교 명령
 
 ```bash
 git fetch origin

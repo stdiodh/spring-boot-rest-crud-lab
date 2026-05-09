@@ -10,7 +10,7 @@
 4. Controller에서 API 엔드포인트를 Service에 연결합니다.
 5. Swagger에서 POST와 GET을 직접 실행합니다.
 
-## 핵심 정답 흐름
+## 핵심 참고 구현 흐름
 
 ### `PostResponse.from(...)`
 

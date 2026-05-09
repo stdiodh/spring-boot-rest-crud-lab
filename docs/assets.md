@@ -10,7 +10,7 @@
 | 테스트 기본 클래스 | 최소 실행 검증을 바로 할 수 있게 하기 위해 |
 | 실행용 `application.yaml` | 앱 이름과 Swagger 경로를 단순하게 유지하기 위해 |
 
-## 정답 코드에서 확인하는 것
+## 참고 구현에서 확인하는 것
 
 - `PostResponse` 변환 흐름
 - `PostMemoryRepository` 저장 / 조회 흐름
