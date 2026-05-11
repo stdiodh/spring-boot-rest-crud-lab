@@ -1,0 +1,80 @@
+window.visualLabData = {
+  sequence: "01",
+  title: "REST CRUD",
+  goal: "HTTP 요청이 Controller, Service, 메모리 저장소를 지나 응답으로 돌아오는 흐름을 본다.",
+  implementationBranch: "01-implementation",
+  concepts: [
+    {
+      name: "Controller",
+      description: "HTTP 요청을 받아 입력을 해석하고 응답 형태를 결정한다.",
+    },
+    {
+      name: "Service",
+      description: "게시글 생성, 조회, 수정, 삭제 같은 핵심 흐름을 조율한다.",
+    },
+    {
+      name: "DTO",
+      description: "요청과 응답에 필요한 데이터 모양을 코드 안에서 분리한다.",
+    },
+    {
+      name: "Memory Repository",
+      description: "DB 없이 메모리에 데이터를 저장하며 CRUD 흐름을 연습한다.",
+    },
+  ],
+  flow: [
+    {
+      id: "request",
+      title: "요청이 들어온다",
+      actor: "Client",
+      target: "PostController",
+      description: "클라이언트가 HTTP method와 path로 어떤 작업을 원하는지 전달한다.",
+      checkpoint: "요청 path와 HTTP method가 의도한 CRUD 동작과 맞는지 확인한다.",
+    },
+    {
+      id: "dto",
+      title: "요청 데이터를 해석한다",
+      actor: "PostController",
+      target: "Request DTO",
+      description: "Controller는 body와 path variable을 DTO 또는 파라미터로 받는다.",
+      checkpoint: "요청 필드 이름과 타입이 DTO와 일치하는지 확인한다.",
+    },
+    {
+      id: "service",
+      title: "비즈니스 흐름을 맡긴다",
+      actor: "PostController",
+      target: "PostService",
+      description: "Controller는 직접 저장하지 않고 Service에 CRUD 작업을 위임한다.",
+      checkpoint: "Controller가 HTTP 처리에 집중하고 Service가 작업 흐름을 담당하는지 본다.",
+    },
+    {
+      id: "repository",
+      title: "메모리 저장소를 사용한다",
+      actor: "PostService",
+      target: "PostMemoryRepository",
+      description: "Service는 Repository를 통해 게시글을 저장하거나 조회한다.",
+      checkpoint: "생성, 단건 조회, 목록 조회, 수정, 삭제가 같은 저장소 기준으로 동작하는지 확인한다.",
+    },
+    {
+      id: "response",
+      title: "응답으로 변환한다",
+      actor: "PostService",
+      target: "Response DTO",
+      description: "저장된 도메인 데이터를 클라이언트에 필요한 응답 형태로 바꾼다.",
+      checkpoint: "응답 status와 body가 API 의도와 맞는지 확인한다.",
+    },
+    {
+      id: "swagger",
+      title: "API를 눈으로 확인한다",
+      actor: "Browser",
+      target: "Swagger UI",
+      description: "Swagger에서 API 목록과 요청/응답 예시를 확인하며 흐름을 점검한다.",
+      checkpoint: "브라우저에서 각 CRUD API가 같은 순서로 동작하는지 실행해 본다.",
+    },
+  ],
+  checkpoints: [
+    "Controller, Service, Repository 역할이 섞이지 않았는지 확인한다.",
+    "POST, GET, PUT/PATCH, DELETE 요청이 각각 다른 CRUD 동작으로 연결되는지 확인한다.",
+    "응답 status와 JSON body가 요청 의도와 맞는지 확인한다.",
+    "실습은 01-implementation 브랜치에서 시작한다.",
+  ],
+};
