@@ -1,101 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A&I 01 REST CRUD Visual Lab</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A&I Visual Lab</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <main class="app-shell">
-    <header class="hero">
-      <p id="sequenceLabel" class="eyebrow"></p>
-      <h1 id="labTitle"></h1>
-      <p id="labGoal" class="hero-goal"></p>
-    </header>
-
-    <section class="panel problem-panel" aria-labelledby="problemTitle">
-      <div class="section-heading">
-        <p class="eyebrow">Problem</p>
-        <h2 id="problemTitle">이 시퀀스가 해결하는 문제</h2>
-      </div>
-      <p id="problemText" class="lead-text"></p>
-    </section>
-
-    <section class="panel flow-panel" aria-labelledby="flowTitle">
-      <div class="section-heading">
-        <p class="eyebrow">Flow</p>
-        <h2 id="flowTitle">4단계 학습 흐름</h2>
-      </div>
-
-      <div id="flowSteps" class="flow-steps"></div>
-
-      <article class="step-detail" aria-live="polite">
-        <p id="stepMeta" class="step-meta"></p>
-        <h3 id="stepTitle"></h3>
-        <div class="step-grid">
-          <section>
-            <h4>문제</h4>
-            <p id="stepProblem"></p>
-          </section>
-          <section>
-            <h4>개념</h4>
-            <p id="stepConcept"></p>
-          </section>
-          <section>
-            <h4>실행</h4>
-            <p id="stepAction"></p>
-          </section>
-          <section>
-            <h4>확인</h4>
-            <p id="stepCheck"></p>
-          </section>
-        </div>
-      </article>
-
-      <div class="step-controls">
-        <button id="prevStep" type="button">이전</button>
-        <span id="stepProgress"></span>
-        <button id="nextStep" type="button">다음</button>
-      </div>
-    </section>
-
-    <section class="panel" aria-labelledby="conceptsTitle">
-      <div class="section-heading">
-        <p class="eyebrow">Concepts</p>
-        <h2 id="conceptsTitle">핵심 개념</h2>
-      </div>
-      <div id="conceptList" class="concept-grid"></div>
-    </section>
-
-    <section class="panel" aria-labelledby="checkpointsTitle">
-      <div class="section-heading">
-        <p class="eyebrow">Practice Check</p>
-        <h2 id="checkpointsTitle">멘티 확인 항목</h2>
-      </div>
-      <div class="practice-layout">
-        <ul id="practiceList" class="checkpoint-list"></ul>
-        <aside class="code-panel" aria-label="이번 시퀀스 API 경로">
-          <p>API Paths</p>
-          <code>POST /posts</code>
-          <code>GET /posts</code>
-          <code>GET /posts/{id}</code>
-        </aside>
-      </div>
-    </section>
-
-    <section class="panel mentor-panel" aria-labelledby="mentorTitle">
-      <button id="mentorToggle" class="mentor-toggle" type="button" aria-expanded="false" aria-controls="mentorHints">
-        <span>Mentor Hint</span>
-        <span aria-hidden="true">펼치기</span>
-      </button>
-      <div id="mentorHints" class="mentor-hints" hidden>
-        <h2 id="mentorTitle">수업 진행 힌트</h2>
-        <ul id="mentorHintList" class="checkpoint-list"></ul>
-      </div>
-    </section>
-  </main>
-
+  <div id="app" class="app-shell">
+    <noscript>Visual Lab을 보려면 JavaScript를 활성화해주세요.</noscript>
+  </div>
   <script src="./visual-lab-data.js"></script>
   <script src="./visual-lab.js"></script>
 </body>
