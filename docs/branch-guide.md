@@ -14,5 +14,6 @@
 
 ## 기존 브랜치 메모
 
-이 레포에는 과거 운영용 `implementation`, `answer` 브랜치가 남아 있을 수 있습니다.  
+이 레포에는 과거 운영용 `implementation`, `answer` 브랜치가 남아 있을 수 있습니다.
+이 브랜치들은 새 수업 안내에 사용하지 않고 deprecated 후보로만 기록합니다.
 정식 수업 운영에서는 `01-implementation`, `01-answer`를 기준으로 사용합니다.
