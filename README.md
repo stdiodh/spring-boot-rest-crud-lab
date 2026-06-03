@@ -16,7 +16,6 @@ DB나 보안으로 넘어가기 전에 요청이 들어오고, Service가 처리
 
 - [이론 문서](./docs/theory.md)
 - [구현 안내](./docs/implementation.md)
-- [참고 구현 비교 가이드](./docs/answer-guide.md)
 - [체크리스트](./docs/checklist.md)
 - [제공 자료 안내](./docs/assets.md)
 
@@ -47,5 +46,3 @@ Swagger UI:
 ```text
 http://localhost:8080/swagger
 ```
-
-수업 후에는 `01-answer` 브랜치에서 참고 구현과 비교합니다.

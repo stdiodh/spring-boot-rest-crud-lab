@@ -80,6 +80,8 @@ fun from(post: Post): PostResponse = PostResponse(
 http://localhost:8080/swagger
 ```
 
-## 참고 구현 비교
+## 마지막 확인
 
-수업 후 `01-answer` 브랜치에서 완성 코드와 비교합니다.
+- Swagger에서 생성, 전체 조회, 단건 조회를 실행합니다.
+- 테스트가 실패하면 Controller mapping, Service 호출, Repository 저장 흐름 순서로 확인합니다.
+- 완료 후 비교가 필요하면 수업 안내에 따라 별도 비교 자료를 확인합니다.

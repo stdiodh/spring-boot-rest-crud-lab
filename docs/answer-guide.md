@@ -1,26 +1,16 @@
-# 요청-응답과 메모리 CRUD 참고 구현 비교 가이드
+# 요청-응답과 메모리 CRUD 비교 안내
 
-이 브랜치는 starter이므로 참고 구현를 그대로 싣지 않습니다.
-완성된 흐름은 `01-answer` 브랜치에서 확인합니다.
+이 문서는 이전 운영에서 starter 브랜치에 두었던 비교 안내입니다.
+현재 starter 브랜치에서는 세부 비교 내용, 비교 브랜치명, 구현 해설을 싣지 않습니다.
 
-## 참고 구현 브랜치에서 비교할 파일
+## 실습 중 우선 볼 문서
 
-- `PostResponse.kt`
-- `PostMemoryRepository.kt`
-- `PostService.kt`
-- `PostController.kt`
+- `README.md`
+- `docs/theory.md`
+- `docs/implementation.md`
+- `docs/checklist.md`
 
-## 비교할 질문
+## 유지 이유
 
-- `PostResponse.from(...)`이 내부 데이터를 응답 DTO로 바꾸는가
-- `PostMemoryRepository.save(...)`가 새 id를 붙이고 리스트에 저장하는가
-- `PostService.create(...)`가 request -> Post -> save -> response 흐름을 갖는가
-- `PostController`가 직접 저장하지 않고 Service만 호출하는가
-- Swagger에서 POST / GET 흐름이 실행되는가
-
-## 참고 구현 비교 명령
-
-```bash
-git fetch origin
-git diff 01-implementation..01-answer
-```
+- 외부에서 이 경로를 열 가능성이 있어 바로 삭제하지 않고 안내 문서로 남깁니다.
+- 다음 정리 단계에서 README와 체크리스트에 안내가 충분히 흡수되면 삭제 여부를 판단할 수 있습니다.
