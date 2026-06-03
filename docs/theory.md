@@ -1,58 +1,52 @@
-# 요청-응답과 메모리 CRUD 이론 정리
+# 이론 정리
 
-이번 시퀀스는 백엔드가 요청을 받고, 처리하고, 응답으로 돌려주는 가장 기본 흐름을 가볍게 경험하는 단계입니다.
+## 1. 왜 이 개념이 필요한가
 
-## 먼저 이것만 기억해도 됩니다
+백엔드 입문 단계에서 가장 먼저 필요한 것은 기술 이름을 많이 아는 것이 아니라 요청이 들어와 응답으로 나가기까지의 흐름을 설명하는 능력입니다.
+흐름이 잡히지 않으면 DB, Validation, Security를 붙일 때 어떤 계층에 무엇을 둬야 하는지 판단하기 어렵습니다.
 
-- Controller는 요청이 들어오는 입구입니다.
-- Service는 실제 처리 흐름을 모으는 곳입니다.
-- Repository는 데이터를 저장하고 조회하는 역할을 맡습니다.
-- DTO는 요청과 응답의 데이터 모양을 정리합니다.
-- 지금은 DB 대신 메모리 저장소를 써서 흐름부터 먼저 익힙니다.
+이번 시퀀스는 메모리 CRUD를 사용해 Controller, Service, Repository, DTO의 역할을 가장 짧은 형태로 확인합니다.
 
-## 왜 이 시퀀스가 필요한가
+## 2. 기존 방식의 한계
 
-백엔드를 처음 배울 때 가장 헷갈리는 것은 기술 이름보다 흐름입니다.
-요청이 어디서 시작하고, 누가 처리하고, 어떤 모양으로 응답이 나가는지가 안 잡히면 다음 단계가 전부 어렵게 느껴집니다.
+Controller 안에서 요청 처리, 데이터 생성, 저장, 응답 변환을 모두 처리하면 처음에는 짧아 보입니다.
+하지만 기능이 늘어나면 요청 입구와 처리 흐름, 저장 방식, 응답 모양이 한 파일에 섞입니다.
 
-그래서 이번 실습에서는 기능을 과하게 늘리지 않습니다.
-메모리 기반 CRUD로 가장 짧은 요청-응답 장면을 먼저 잡고, 다음 시퀀스에서 저장 방식을 어떻게 바꿀지 자연스럽게 이어가도록 만듭니다.
+이렇게 섞인 코드는 다음 시퀀스에서 DB 저장소로 바꿀 때도 어디를 바꿔야 하는지 흐려집니다.
+그래서 이번 단계부터 계층을 분리해 두고, 각 계층이 맡는 책임을 작게 유지합니다.
 
-실무에서도 장애를 볼 때는 먼저 요청이 어느 계층을 지나 응답으로 나갔는지부터 추적합니다.
+## 3. 이번 시퀀스에서 선택한 접근
 
-## 기초 개념
+- Controller는 HTTP endpoint와 Service 호출만 담당합니다.
+- Service는 요청 DTO를 내부 데이터로 바꾸고 저장소와 응답 DTO를 연결합니다.
+- Repository는 메모리 리스트를 사용해 저장과 조회를 담당합니다.
+- DTO는 외부 요청/응답 모양을 내부 데이터와 분리합니다.
+
+DB를 아직 붙이지 않는 이유는 저장 기술보다 요청-응답 흐름을 먼저 보기 위해서입니다.
+
+## 4. 핵심 개념
 
 ### Controller
 
 Controller는 요청이 처음 들어오는 입구입니다.
-이번 코드에서는 `PostController`가 이 역할을 맡습니다.
+이번 코드에서는 `PostController`가 `POST /posts`, `GET /posts`, `GET /posts/{id}`를 Service에 연결합니다.
 
 ### Service
 
 Service는 실제 처리 흐름을 모으는 곳입니다.
-이번 코드에서는 `PostService`가 이 역할을 맡습니다.
+`PostService`는 요청 DTO를 `Post`로 바꾸고, 저장소를 호출하고, 응답 DTO로 다시 변환합니다.
 
 ### Repository
 
 Repository는 데이터를 저장하고 조회하는 역할을 맡습니다.
-이번에는 DB를 붙이지 않고 `PostMemoryRepository`가 메모리 리스트를 사용합니다.
+이번에는 DB를 붙이지 않고 `PostMemoryRepository`가 애플리케이션 안의 리스트를 사용합니다.
 
 ### DTO
 
 DTO는 요청과 응답을 주고받는 전용 데이터 모양입니다.
+`PostCreateRequest`는 생성 요청에 필요한 값만 받고, `PostResponse`는 응답으로 돌려줄 값만 정리합니다.
 
-- `PostCreateRequest`: 생성 요청에 필요한 값
-- `PostResponse`: 응답으로 돌려줄 값
-
-## 현재 코드 흐름
-
-이번 실습의 핵심 흐름은 아래와 같습니다.
-
-1. 클라이언트가 `POST /posts`로 생성 요청을 보냅니다.
-2. `PostController`가 요청을 받습니다.
-3. `PostService`가 요청 DTO를 `Post` 데이터로 바꿉니다.
-4. `PostMemoryRepository`가 메모리에 저장합니다.
-5. `PostResponse`로 응답 형태를 정리해 돌려줍니다.
+## 5. 짧은 예제와 해설
 
 ```kotlin
 @PostMapping
@@ -61,6 +55,9 @@ fun create(@RequestBody request: PostCreateRequest): PostResponse {
     return postService.create(request)
 }
 ```
+
+Controller는 요청을 받고 Service에 넘깁니다.
+저장 방식이나 응답 변환 세부 로직을 Controller 안에 넣지 않습니다.
 
 ```kotlin
 fun create(request: PostCreateRequest): PostResponse {
@@ -75,17 +72,19 @@ fun create(request: PostCreateRequest): PostResponse {
 }
 ```
 
-## 자주 헷갈리는 포인트
+Service는 request -> domain -> repository -> response 흐름을 연결합니다.
+`id = 0L`은 저장 전 임시 값이고, 실제 id는 메모리 저장소가 부여합니다.
 
-- Controller는 요청을 받는 곳이지 데이터를 직접 저장하는 곳이 아닙니다.
-- Service는 어려운 로직만 모으는 곳이 아니라 처리 흐름을 정리하는 곳입니다.
-- 메모리 저장은 DB가 아니기 때문에 서버 재시작 뒤 데이터가 남지 않습니다.
-- Swagger는 이번 단계에서 API 실행 확인 도구로 보면 됩니다.
+## 6. 다음 구현으로 연결되는 지점
 
-## 복습 체크리스트
+다음 DB Access 시퀀스에서는 메모리 리스트 대신 DB와 Repository 구현이 등장합니다.
+이번 단계에서 Controller와 Service 흐름을 분리해 두면 저장소가 바뀌어도 요청 입구와 응답 모양을 더 안정적으로 유지할 수 있습니다.
 
-- [ ] `POST /posts` 생성 흐름을 순서대로 설명할 수 있습니다.
-- [ ] `GET /posts`와 `GET /posts/{id}`의 차이를 설명할 수 있습니다.
-- [ ] Controller와 Service 역할 차이를 말할 수 있습니다.
-- [ ] 메모리 저장의 장점과 한계를 한 문장으로 설명할 수 있습니다.
-- [ ] Swagger에서 API를 직접 실행할 수 있습니다.
+<details>
+<summary>멘토용 설명 포인트</summary>
+
+- 멘티가 Controller를 "모든 일을 하는 파일"로 이해하지 않도록 Service 호출 경계를 먼저 짚습니다.
+- `PostResponse.from(...)`은 정답 코드 암기가 아니라 내부 데이터와 응답 데이터 분리 기준으로 설명합니다.
+- answer 브랜치 비교 시 `save()`에서 id를 부여하는 위치와 `findAll()`에서 복사본을 반환하는 이유를 확인합니다.
+
+</details>
