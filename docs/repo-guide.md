@@ -11,6 +11,14 @@
 - 메모리 저장소 기반 CRUD
 - Request DTO와 Response DTO
 
+## 공식 브랜치
+
+| 용도 | 브랜치 |
+| --- | --- |
+| 가이드 | `main` |
+| 학생 시작 | `01-implementation` |
+| 참고 정답 | `01-answer` |
+
 ## 다루지 않는 것
 
 - MySQL, JPA

@@ -5,10 +5,10 @@
 
 ## 이 레포에서 배우는 것
 
-- Controller가 요청을 받는 흐름
-- Service가 처리 중심이 되는 흐름
-- Repository가 메모리 저장소를 다루는 흐름
-- DTO로 요청과 응답을 분리하는 이유
+- 브라우저나 Postman에서 보낸 요청이 Controller로 들어오는 흐름
+- Service가 요청 처리 순서를 모으는 방식
+- Repository가 메모리 저장소를 다루는 방식
+- DTO로 요청과 응답을 나누는 이유
 - 서버 재시작 후 메모리 데이터가 사라지는 이유
 
 ## 시작 방법
@@ -18,6 +18,8 @@ git clone https://github.com/stdiodh/spring-boot-rest-crud-lab.git
 cd spring-boot-rest-crud-lab
 git checkout 01-implementation
 ```
+
+clone 뒤에는 원격 default branch 상태와 관계없이 `01-implementation`을 명시적으로 checkout합니다.
 
 ## 실습 브랜치
 
@@ -92,5 +94,7 @@ http://localhost:8080
 
 ## 운영 메모
 
-legacy `implementation` / `answer` 브랜치가 남아 있다면 deprecated로만 취급합니다.
-정식 수업 운영에서는 `01-implementation` / `01-answer`만 사용합니다.
+정식 수업 운영에서는 `main`, `01-implementation`, `01-answer`만 사용합니다.
+legacy `implementation`, `answer` 브랜치가 남아 있다면 deprecated로만 취급합니다.
+GitHub remote default branch 변경은 Codex가 직접 수행하지 못합니다.
+운영자가 GitHub Settings 또는 gh CLI로 default branch를 `main`으로 변경해야 합니다.
