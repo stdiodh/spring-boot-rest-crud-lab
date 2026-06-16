@@ -19,8 +19,6 @@ cd spring-boot-rest-crud-lab
 git checkout 01-implementation
 ```
 
-clone 뒤에는 원격 default branch 상태와 관계없이 `01-implementation`을 명시적으로 checkout합니다.
-
 ## 실습 브랜치
 
 | 용도 | 브랜치 |
@@ -91,10 +89,3 @@ python3 -m http.server 8080 -d docs/visual-lab
 ```text
 http://localhost:8080
 ```
-
-## 운영 메모
-
-정식 수업 운영에서는 `main`, `01-implementation`, `01-answer`만 사용합니다.
-legacy `implementation`, `answer` 브랜치가 남아 있다면 deprecated로만 취급합니다.
-GitHub remote default branch 변경은 Codex가 직접 수행하지 못합니다.
-운영자가 GitHub Settings 또는 gh CLI로 default branch를 `main`으로 변경해야 합니다.

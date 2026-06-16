@@ -327,9 +327,9 @@ window.visualLabData = {
       "question": "HTTP 요청이 서버 안에서 어떤 계층을 지나 응답 DTO로 돌아올까?",
       "goal": "Controller, Service, 메모리 저장소, DTO의 책임을 분리해 가장 작은 CRUD 흐름을 이해합니다.",
       "source": {
-        "theory": "../theory.md",
-        "implementation": "../implementation.md",
-        "checklist": "../checklist.md"
+        "theory": "../../../theory.md",
+        "implementation": "../../../implementation.md",
+        "checklist": "../../../checklist.md"
       },
       "why": {
         "problem": "백엔드 코드는 사용자의 HTTP 요청을 받아 처리하고 응답을 돌려주는 흐름으로 시작합니다.",
