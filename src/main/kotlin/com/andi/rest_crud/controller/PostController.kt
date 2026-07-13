@@ -18,22 +18,19 @@ class PostController(
     private val postService: PostService
 ) {
 
-    // TODO(A&I) 1. Service의 getAll()을 호출하세요.
-    // TODO(A&I) 2. Controller가 직접 저장소를 만지지 않게 유지하세요.
+    // TODO(A&I): 저장소를 직접 사용하지 말고 Service의 전체 조회를 호출하세요.
     @GetMapping
     fun getAll(): List<PostResponse> {
         TODO("postService.getAll()을 반환하세요.")
     }
 
-    // TODO(A&I) 1. 경로 변수 id를 Service로 넘기세요.
+    // TODO(A&I): 경로 변수 id를 Service로 넘기세요.
     @GetMapping("/{id}")
     fun getById(@PathVariable id: Long): PostResponse {
         TODO("postService.getById(id)를 반환하세요.")
     }
 
-    // TODO(A&I) 1. 요청 본문을 PostCreateRequest로 받으세요.
-    // TODO(A&I) 2. 생성은 Service가 담당하게 하세요.
-    // TODO(A&I) 3. 성공 시 201 Created를 내려주세요.
+    // TODO(A&I): 요청 DTO를 Service로 넘기고 생성 성공 시 201을 반환하세요.
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody request: PostCreateRequest): PostResponse {
