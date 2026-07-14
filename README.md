@@ -26,8 +26,6 @@ DB나 보안으로 넘어가기 전에 요청이 들어오고, Service가 처리
 1. [이론 정리](./docs/theory.md)
 2. [구현 가이드](./docs/implementation.md)
 3. [체크리스트](./docs/checklist.md)
-4. [참고 구현 가이드](./docs/answer-guide.md)
-5. [제공 자료 안내](./docs/assets.md)
 
 ## 실행 / 테스트 방법
 
