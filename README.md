@@ -29,6 +29,8 @@ git checkout 01-implementation
 
 ## 실행 방법
 
+starter는 Kotlin/Spring Boot 설정, Swagger 연결, 기본 패키지와 테스트 부트스트랩을 제공합니다. 학생은 DTO, 메모리 Repository, Service, Controller의 요청-응답 흐름을 완성합니다.
+
 ```bash
 ./gradlew bootRun
 ```
@@ -89,3 +91,10 @@ python3 -m http.server 8080 -d docs/visual-lab
 ```text
 http://localhost:8080
 ```
+
+## 문서 안내
+
+- [이론 정리](./docs/theory.md)
+- [구현 안내](./docs/implementation.md)
+- [체크리스트](./docs/checklist.md)
+- [Visual Lab](./docs/visual-lab/index.html)
