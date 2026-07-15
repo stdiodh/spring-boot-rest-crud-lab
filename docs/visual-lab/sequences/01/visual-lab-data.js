@@ -10,6 +10,83 @@ window.visualLabData = {
     "path": "spring-boot-rest-crud-lab"
   },
   "defaultSequence": "01",
+  "workbench": {
+    "kind": "request-trace",
+    "title": "메모리 CRUD 요청 추적기",
+    "instruction": "요청 종류를 선택하고 Controller, Service, 메모리 Repository, DTO가 맡는 책임을 경로와 실행 증거로 확인하세요.",
+    "scenarios": [
+      {
+        "id": "create-in-memory",
+        "label": "게시글 생성",
+        "flowId": "create-post",
+        "tone": "recovered",
+        "prompt": "POST body는 어디에서 내부 Post가 되고 새 id를 가진 응답으로 돌아올까요?",
+        "route": [
+          "Client",
+          "PostController",
+          "PostCreateRequest",
+          "PostService",
+          "PostMemoryRepository",
+          "Memory Store",
+          "PostResponse",
+          "Client"
+        ],
+        "snapshot": [
+          { "label": "Request", "value": "POST /posts" },
+          { "label": "저장 결과", "value": "id가 붙은 Post", "tone": "recovered" },
+          { "label": "Response", "value": "201 Created + JSON" }
+        ],
+        "evidence": "Swagger 생성 응답과 PostMemoryRepository.save(...)가 붙인 id를 함께 확인합니다.",
+        "outcome": "Controller는 입구를 지키고 Service가 DTO·내부 모델·저장소·응답 변환을 연결합니다."
+      },
+      {
+        "id": "read-in-memory",
+        "label": "전체·단건 조회",
+        "flowId": "read-post",
+        "tone": "signal",
+        "prompt": "URL의 조회 의도와 id는 어떤 책임을 지나 응답 DTO가 될까요?",
+        "route": [
+          "Client",
+          "PostController",
+          "PostService",
+          "PostMemoryRepository",
+          "Memory Store",
+          "PostResponse",
+          "Client"
+        ],
+        "snapshot": [
+          { "label": "Request", "value": "GET /posts 또는 GET /posts/{id}" },
+          { "label": "Repository", "value": "findAll / findById" },
+          { "label": "Response", "value": "PostResponse 또는 목록" }
+        ],
+        "evidence": "Swagger의 전체·단건 조회 결과와 Service의 PostResponse 변환을 비교합니다.",
+        "outcome": "조회 결과를 내부 Post 그대로 내보내지 않고 API 응답 DTO로 정리합니다."
+      },
+      {
+        "id": "restart-memory",
+        "label": "서버 재시작",
+        "flowId": "create-post",
+        "tone": "warning",
+        "prompt": "저장에 성공했던 게시글이 서버 재시작 뒤 사라지는 이유는 무엇일까요?",
+        "route": [
+          "Client",
+          "PostController",
+          "PostService",
+          "PostMemoryRepository",
+          "Memory Store",
+          "서버 재시작",
+          "Memory Store"
+        ],
+        "snapshot": [
+          { "label": "재시작 전", "value": "메모리 목록에 존재" },
+          { "label": "재시작 후", "value": "빈 목록", "tone": "warning" },
+          { "label": "다음 질문", "value": "프로세스 밖 영속 저장소" }
+        ],
+        "evidence": "서버를 다시 실행한 뒤 GET /posts 결과가 비어 있는지 확인합니다.",
+        "outcome": "메모리 컬렉션은 프로세스 수명과 함께 사라지므로 다음 시퀀스에서 DB 저장으로 교체해야 합니다."
+      }
+    ]
+  },
   "actors": [
     {
       "id": "client",
