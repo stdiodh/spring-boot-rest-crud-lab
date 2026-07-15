@@ -14,6 +14,40 @@ window.visualLabData = {
     "kind": "request-trace",
     "title": "메모리 CRUD 요청 추적기",
     "instruction": "요청 종류를 선택하고 Controller, Service, 메모리 Repository, DTO가 맡는 책임을 경로와 실행 증거로 확인하세요.",
+    "visual": {
+      "src": "../../assets/diagrams/01-memory-crud-map.svg",
+      "alt": "Client 요청이 Controller, Service, 메모리 Repository를 거쳐 응답 DTO로 돌아오는 구조",
+      "caption": "HTTP 입구와 애플리케이션 처리, 프로세스 메모리의 책임을 분리합니다."
+    },
+    "terms": [
+      {
+        "term": "DTO",
+        "meaning": "HTTP 요청·응답처럼 경계 사이에서 필요한 데이터만 옮기는 객체입니다."
+      },
+      {
+        "term": "Service",
+        "meaning": "변환과 저장, 조회 순서를 조립하는 애플리케이션 책임입니다."
+      },
+      {
+        "term": "Repository",
+        "meaning": "데이터를 보관하고 다시 찾는 방법을 캡슐화하는 책임입니다."
+      },
+      {
+        "term": "메모리 저장소",
+        "meaning": "실행 중인 프로세스 안의 컬렉션에만 데이터를 보관하는 저장 방식입니다."
+      }
+    ],
+    "comparison": {
+      "label": "같은 Repository라도 다른 데이터 수명",
+      "left": {
+        "title": "프로세스 메모리",
+        "body": "빠르게 CRUD 흐름을 배우지만 서버 재시작과 함께 데이터가 사라집니다."
+      },
+      "right": {
+        "title": "외부 DB",
+        "body": "애플리케이션 프로세스와 분리되어 재시작 뒤에도 데이터를 다시 조회할 수 있습니다."
+      }
+    },
     "nodes": {
       "client": {
         "label": "Client",
@@ -54,6 +88,21 @@ window.visualLabData = {
         "flowId": "create-post",
         "tone": "recovered",
         "prompt": "POST body는 어디에서 내부 Post가 되고 새 id를 가진 응답으로 돌아올까요?",
+        "prediction": {
+          "prompt": "POST body가 새 id를 가진 응답이 되기까지 책임을 어떻게 나누는 편이 맞을까요?",
+          "options": [
+            {
+              "id": "controller-direct",
+              "label": "Controller가 변환과 저장을 모두 직접 처리한다"
+            },
+            {
+              "id": "service-repository",
+              "label": "Service가 변환을 조립하고 Repository가 id와 저장을 맡는다"
+            }
+          ],
+          "answer": "service-repository",
+          "explanation": "Controller는 HTTP 입구를 지키고 Service와 Repository가 처리·보관 책임을 나눕니다."
+        },
         "diagram": {
           "caption": "Service가 요청 DTO를 내부 Post로 바꾸고, Repository가 id를 붙인 뒤 응답 DTO로 돌아옵니다.",
           "lanes": [
@@ -155,6 +204,21 @@ window.visualLabData = {
         "flowId": "read-post",
         "tone": "signal",
         "prompt": "URL의 조회 의도와 id는 어떤 책임을 지나 응답 DTO가 될까요?",
+        "prediction": {
+          "prompt": "메모리에서 찾은 내부 Post를 API 응답으로 보낼 때 무엇을 거칠까요?",
+          "options": [
+            {
+              "id": "return-model",
+              "label": "내부 Post를 그대로 반환한다"
+            },
+            {
+              "id": "response-dto",
+              "label": "Service가 PostResponse DTO로 변환한다"
+            }
+          ],
+          "answer": "response-dto",
+          "explanation": "외부 응답 계약과 내부 모델을 분리하기 위해 조회 결과도 Response DTO로 변환합니다."
+        },
         "diagram": {
           "caption": "조회 조건은 Controller에서 Service로 전달되고, 메모리 목록의 Post는 응답 DTO로 변환되어 돌아옵니다.",
           "lanes": [
@@ -253,6 +317,21 @@ window.visualLabData = {
         "flowId": "create-post",
         "tone": "warning",
         "prompt": "저장에 성공했던 게시글이 서버 재시작 뒤 사라지는 이유는 무엇일까요?",
+        "prediction": {
+          "prompt": "메모리에 저장한 게시글은 서버 재시작 뒤 어떻게 될까요?",
+          "options": [
+            {
+              "id": "remains",
+              "label": "같은 id와 내용으로 남는다"
+            },
+            {
+              "id": "cleared",
+              "label": "프로세스와 함께 사라져 조회 결과가 비어진다"
+            }
+          ],
+          "answer": "cleared",
+          "explanation": "List는 실행 중인 프로세스 안에 있으므로 프로세스가 끝나면 저장 상태도 사라집니다."
+        },
         "diagram": {
           "caption": "Repository가 가진 List는 애플리케이션 프로세스 안에 있으므로 재시작하면 새 빈 목록으로 만들어집니다.",
           "lanes": [
