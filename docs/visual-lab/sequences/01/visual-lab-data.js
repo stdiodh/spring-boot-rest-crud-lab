@@ -12,7 +12,7 @@ window.visualLabData = {
   "defaultSequence": "01",
   "workbench": {
     "kind": "request-trace",
-    "title": "메모리 CRUD 요청 추적기",
+    "title": "메모리 CRUD 요청이 왕복하는 과정",
     "instruction": "요청 종류를 선택하고 Controller, Service, 메모리 Repository, DTO가 맡는 책임을 경로와 실행 증거로 확인하세요.",
     "visual": {
       "src": "../../assets/diagrams/01-memory-crud-map.svg",
@@ -72,13 +72,20 @@ window.visualLabData = {
         "boundary": "애플리케이션 처리",
         "codePointIds": ["memory-service"]
       },
+      "app-runtime": {
+        "label": "Spring Boot process",
+        "icon": "service",
+        "kind": "service",
+        "role": "애플리케이션과 그 안의 Repository 인스턴스를 시작하고 종료합니다.",
+        "boundary": "프로세스 수명"
+      },
       "memory-repository": {
         "label": "PostMemoryRepository",
         "icon": "memory",
         "kind": "repository",
         "role": "프로세스 안의 List를 소유하고 id 부여와 조회를 담당합니다.",
         "boundary": "프로세스 메모리",
-        "codePointIds": ["memory-service"]
+        "codePointIds": ["memory-repository"]
       }
     },
     "scenarios": [
@@ -88,6 +95,12 @@ window.visualLabData = {
         "flowId": "create-post",
         "tone": "recovered",
         "prompt": "POST body는 어디에서 내부 Post가 되고 새 id를 가진 응답으로 돌아올까요?",
+        "observationTitle": "요청 JSON은 어디서 새 id를 가진 응답으로 바뀌는가?",
+        "reflection": {
+          "prompt": "생성 흐름에서 Controller, Service, Repository의 상태 변화 규칙을 한 문장으로 적어 보세요.",
+          "hint": "binding, 내부 데이터 변환, id 부여, 응답 변환을 순서대로 연결하세요."
+        },
+        "theoryRef": "../../../theory.md#seq-01",
         "prediction": {
           "prompt": "POST body가 새 id를 가진 응답이 되기까지 책임을 어떻게 나누는 편이 맞을까요?",
           "options": [
@@ -117,9 +130,18 @@ window.visualLabData = {
                   "verb": "요청",
                   "payload": "POST /posts + JSON body",
                   "kind": "request",
+                  "effect": {
+                    "kind": "transfer",
+                    "subject": "POST /posts + JSON body",
+                    "before": "Client: POST /posts + JSON body 전송 준비",
+                    "after": "PostController: POST /posts + JSON body 수신"
+                  },
+                  "evidenceScope": "manual",
                   "concept": "HTTP entry",
                   "check": "method, path, body를 확인합니다.",
-                  "codePointIds": ["controller-create"]
+                  "codePointIds": [
+                    "controller-create"
+                  ]
                 },
                 {
                   "from": "controller",
@@ -127,6 +149,13 @@ window.visualLabData = {
                   "verb": "호출",
                   "payload": "create(PostCreateRequest)",
                   "kind": "call",
+                  "effect": {
+                    "kind": "transfer",
+                    "subject": "create(PostCreateRequest)",
+                    "before": "PostController: method argument create(PostCreateRequest) 구성",
+                    "after": "PostService: create(PostCreateRequest) method 진입"
+                  },
+                  "evidenceScope": "code",
                   "concept": "Request DTO",
                   "check": "Controller가 Repository를 직접 호출하지 않는지 확인합니다."
                 },
@@ -136,9 +165,18 @@ window.visualLabData = {
                   "verb": "변환",
                   "payload": "PostCreateRequest → Post",
                   "kind": "transform",
+                  "effect": {
+                    "kind": "transform",
+                    "subject": "PostCreateRequest → Post",
+                    "before": "PostService: PostCreateRequest",
+                    "after": "PostService: Post"
+                  },
+                  "evidenceScope": "code",
                   "concept": "외부 요청과 내부 모델 분리",
                   "check": "요청에 없던 id가 아직 임시 값인지 확인합니다.",
-                  "codePointIds": ["memory-service"]
+                  "codePointIds": [
+                    "memory-service"
+                  ]
                 },
                 {
                   "from": "service",
@@ -146,6 +184,13 @@ window.visualLabData = {
                   "verb": "저장",
                   "payload": "save(Post)",
                   "kind": "persist",
+                  "effect": {
+                    "kind": "persist",
+                    "subject": "save(Post)",
+                    "before": "PostMemoryRepository.posts: 해당 게시글 0건",
+                    "after": "PostMemoryRepository.posts: 새 id가 붙은 Post 1건"
+                  },
+                  "evidenceScope": "code",
                   "concept": "in-process persistence",
                   "check": "Repository가 새 id를 붙이는지 확인합니다."
                 },
@@ -155,6 +200,13 @@ window.visualLabData = {
                   "verb": "반환",
                   "payload": "saved Post { id }",
                   "kind": "response",
+                  "effect": {
+                    "kind": "return",
+                    "subject": "saved Post { id }",
+                    "before": "PostService: id가 확정된 Post 없음",
+                    "after": "PostService: 새 id가 있는 saved Post 확보"
+                  },
+                  "evidenceScope": "code",
                   "concept": "저장 결과",
                   "check": "반환된 Post에 id가 있는지 확인합니다."
                 },
@@ -164,6 +216,13 @@ window.visualLabData = {
                   "verb": "변환",
                   "payload": "Post → PostResponse",
                   "kind": "transform",
+                  "effect": {
+                    "kind": "transform",
+                    "subject": "Post → PostResponse",
+                    "before": "PostService: Post",
+                    "after": "PostController: PostResponse"
+                  },
+                  "evidenceScope": "code",
                   "concept": "Response DTO",
                   "check": "내부 Post를 그대로 응답하지 않는지 확인합니다."
                 },
@@ -173,6 +232,13 @@ window.visualLabData = {
                   "verb": "응답",
                   "payload": "201 Created + PostResponse JSON",
                   "kind": "response",
+                  "effect": {
+                    "kind": "return",
+                    "subject": "201 Created + PostResponse JSON",
+                    "before": "Client: HTTP status와 body 미확정",
+                    "after": "Client: 201 Created + PostResponse JSON"
+                  },
+                  "evidenceScope": "runtime",
                   "concept": "HTTP response",
                   "check": "Swagger 응답 status와 id를 확인합니다."
                 }
@@ -204,6 +270,12 @@ window.visualLabData = {
         "flowId": "read-post",
         "tone": "signal",
         "prompt": "URL의 조회 의도와 id는 어떤 책임을 지나 응답 DTO가 될까요?",
+        "observationTitle": "조회 의도와 id가 어떤 호출을 거쳐 응답 DTO가 되는가?",
+        "reflection": {
+          "prompt": "전체 조회와 단건 조회가 같은 계층을 지나면서 달라지는 입력 조건은 무엇인가요?",
+          "hint": "`findAll()`과 `findById(id)`가 선택되는 원인을 URL의 id 유무에서 찾으세요."
+        },
+        "theoryRef": "../../../theory.md#seq-01",
         "prediction": {
           "prompt": "메모리에서 찾은 내부 Post를 API 응답으로 보낼 때 무엇을 거칠까요?",
           "options": [
@@ -233,6 +305,13 @@ window.visualLabData = {
                   "verb": "요청",
                   "payload": "GET /posts 또는 GET /posts/{id}",
                   "kind": "request",
+                  "effect": {
+                    "kind": "transfer",
+                    "subject": "GET /posts 또는 GET /posts/{id}",
+                    "before": "Client: GET /posts 또는 GET /posts/{id} 전송 준비",
+                    "after": "PostController: GET /posts 또는 GET /posts/{id} 수신"
+                  },
+                  "evidenceScope": "manual",
                   "concept": "조회 URL",
                   "check": "전체 조회와 단건 조회 path를 구분합니다."
                 },
@@ -242,6 +321,13 @@ window.visualLabData = {
                   "verb": "호출",
                   "payload": "getAll() 또는 getById(id)",
                   "kind": "call",
+                  "effect": {
+                    "kind": "transfer",
+                    "subject": "getAll() 또는 getById(id)",
+                    "before": "PostController: method argument getAll() 또는 getById(id) 구성",
+                    "after": "PostService: getAll() 또는 getById(id) method 진입"
+                  },
+                  "evidenceScope": "code",
                   "concept": "요청 위임",
                   "check": "PathVariable id가 Service로 전달되는지 확인합니다."
                 },
@@ -251,6 +337,13 @@ window.visualLabData = {
                   "verb": "조회",
                   "payload": "findAll() 또는 findById(id)",
                   "kind": "call",
+                  "effect": {
+                    "kind": "transfer",
+                    "subject": "findAll() 또는 findById(id)",
+                    "before": "PostService: 전체 조회 또는 단건 id 조건을 선택",
+                    "after": "PostMemoryRepository: posts 전체 반환 또는 같은 id 검색"
+                  },
+                  "evidenceScope": "code",
                   "concept": "메모리 조회",
                   "check": "의도와 맞는 Repository method인지 확인합니다."
                 },
@@ -260,6 +353,13 @@ window.visualLabData = {
                   "verb": "반환",
                   "payload": "Post 또는 List<Post>",
                   "kind": "response",
+                  "effect": {
+                    "kind": "return",
+                    "subject": "Post 또는 List<Post>",
+                    "before": "PostService: 메모리 조회 결과 없음",
+                    "after": "PostService: 단건 Post 또는 현재 List<Post> 확보"
+                  },
+                  "evidenceScope": "code",
                   "concept": "내부 모델",
                   "check": "메모리 목록에서 찾은 결과를 확인합니다."
                 },
@@ -269,6 +369,13 @@ window.visualLabData = {
                   "verb": "변환",
                   "payload": "Post → PostResponse",
                   "kind": "transform",
+                  "effect": {
+                    "kind": "transform",
+                    "subject": "Post → PostResponse",
+                    "before": "PostService: Post",
+                    "after": "PostService: PostResponse"
+                  },
+                  "evidenceScope": "code",
                   "concept": "응답 경계",
                   "check": "각 Post가 Response DTO로 바뀌는지 확인합니다."
                 },
@@ -278,6 +385,13 @@ window.visualLabData = {
                   "verb": "반환",
                   "payload": "PostResponse 또는 List<PostResponse>",
                   "kind": "response",
+                  "effect": {
+                    "kind": "return",
+                    "subject": "PostResponse 또는 List<PostResponse>",
+                    "before": "PostController: HTTP body로 보낼 DTO 없음",
+                    "after": "PostController: 단건 PostResponse 또는 변환된 목록 확보"
+                  },
+                  "evidenceScope": "code",
                   "concept": "Service result",
                   "check": "Controller가 결과 모양을 다시 조립하지 않는지 확인합니다."
                 },
@@ -287,6 +401,13 @@ window.visualLabData = {
                   "verb": "응답",
                   "payload": "200 OK + JSON",
                   "kind": "response",
+                  "effect": {
+                    "kind": "return",
+                    "subject": "200 OK + JSON",
+                    "before": "Client: HTTP status와 body 미확정",
+                    "after": "Client: 200 OK + JSON"
+                  },
+                  "evidenceScope": "runtime",
                   "concept": "HTTP response",
                   "check": "Swagger에서 전체·단건 응답을 확인합니다."
                 }
@@ -317,6 +438,12 @@ window.visualLabData = {
         "flowId": "create-post",
         "tone": "warning",
         "prompt": "저장에 성공했던 게시글이 서버 재시작 뒤 사라지는 이유는 무엇일까요?",
+        "observationTitle": "201로 저장한 게시글이 재시작 뒤 빈 목록이 되는가?",
+        "reflection": {
+          "prompt": "서버 재시작이 메모리 게시글을 없애는 인과 규칙을 설명해 보세요.",
+          "hint": "list의 수명이 프로세스와 같고 외부 저장소에는 기록되지 않았다는 점을 연결하세요."
+        },
+        "theoryRef": "../../../theory.md#seq-01",
         "prediction": {
           "prompt": "메모리에 저장한 게시글은 서버 재시작 뒤 어떻게 될까요?",
           "options": [
@@ -345,14 +472,28 @@ window.visualLabData = {
                   "to": "controller",
                   "verb": "요청",
                   "payload": "POST /posts + JSON",
-                  "kind": "request"
+                  "kind": "request",
+                  "effect": {
+                    "kind": "transfer",
+                    "subject": "POST /posts + JSON",
+                    "before": "Client: POST /posts + JSON 전송 준비",
+                    "after": "PostController: POST /posts + JSON 수신"
+                  },
+                  "evidenceScope": "manual"
                 },
                 {
                   "from": "controller",
                   "to": "service",
                   "verb": "호출",
                   "payload": "create(PostCreateRequest)",
-                  "kind": "call"
+                  "kind": "call",
+                  "effect": {
+                    "kind": "transfer",
+                    "subject": "create(PostCreateRequest)",
+                    "before": "PostController: method argument create(PostCreateRequest) 구성",
+                    "after": "PostService: create(PostCreateRequest) method 진입"
+                  },
+                  "evidenceScope": "code"
                 },
                 {
                   "from": "service",
@@ -360,6 +501,13 @@ window.visualLabData = {
                   "verb": "저장",
                   "payload": "Post",
                   "kind": "persist",
+                  "effect": {
+                    "kind": "persist",
+                    "subject": "Post",
+                    "before": "PostMemoryRepository.posts: 해당 게시글 0건",
+                    "after": "PostMemoryRepository.posts: 새 id가 붙은 Post 1건"
+                  },
+                  "evidenceScope": "code",
                   "concept": "프로세스 메모리",
                   "check": "재시작 전 목록에 Post가 있는지 확인합니다."
                 },
@@ -368,35 +516,100 @@ window.visualLabData = {
                   "to": "service",
                   "verb": "반환",
                   "payload": "saved Post { id }",
-                  "kind": "response"
+                  "kind": "response",
+                  "effect": {
+                    "kind": "return",
+                    "subject": "saved Post { id }",
+                    "before": "PostService: id가 확정된 Post 없음",
+                    "after": "PostService: 새 id가 있는 saved Post 확보"
+                  },
+                  "evidenceScope": "code"
+                }
+              ]
+            },
+            {
+              "id": "restart-transition",
+              "label": "프로세스 교체",
+              "description": "이전 프로세스를 종료하고 새 Repository와 빈 List를 가진 프로세스를 시작합니다.",
+              "steps": [
+                {
+                  "from": "app-runtime",
+                  "to": "app-runtime",
+                  "verb": "프로세스 재시작",
+                  "payload": "실행 중 process 종료 → 새 process 시작",
+                  "kind": "event",
+                  "effect": {
+                    "kind": "persist",
+                    "subject": "실행 중 process 종료 → 새 process 시작",
+                    "before": "기존 애플리케이션 process와 그 인스턴스가 실행 중",
+                    "after": "기존 process 종료 후 새 process와 새 인스턴스 실행"
+                  },
+                  "evidenceScope": "manual",
+                  "concept": "프로세스 수명"
+                },
+                {
+                  "from": "app-runtime",
+                  "to": "memory-repository",
+                  "verb": "Repository 생성",
+                  "payload": "PostMemoryRepository + empty mutableListOf<Post>()",
+                  "kind": "event",
+                  "effect": {
+                    "kind": "persist",
+                    "subject": "PostMemoryRepository + empty mutableListOf<Post>()",
+                    "before": "종료된 Repository list: 게시글 1건",
+                    "after": "새 PostMemoryRepository list: 게시글 0건"
+                  },
+                  "evidenceScope": "code",
+                  "concept": "in-process state"
                 }
               ]
             },
             {
               "id": "after-restart",
-              "label": "재시작 후",
-              "description": "새 프로세스에서 Repository의 List가 다시 초기화된 상태입니다.",
+              "label": "재시작 후 조회",
+              "description": "새 프로세스의 빈 Repository 목록을 HTTP 응답으로 확인합니다.",
               "steps": [
                 {
                   "from": "client",
                   "to": "controller",
                   "verb": "다시 조회",
                   "payload": "GET /posts",
-                  "kind": "request"
+                  "kind": "request",
+                  "effect": {
+                    "kind": "transfer",
+                    "subject": "GET /posts",
+                    "before": "Client: GET /posts 전송 준비",
+                    "after": "PostController: GET /posts 수신"
+                  },
+                  "evidenceScope": "manual"
                 },
                 {
                   "from": "controller",
                   "to": "service",
                   "verb": "호출",
                   "payload": "getAll()",
-                  "kind": "call"
+                  "kind": "call",
+                  "effect": {
+                    "kind": "transfer",
+                    "subject": "getAll()",
+                    "before": "PostController: method argument getAll() 구성",
+                    "after": "PostService: getAll() method 진입"
+                  },
+                  "evidenceScope": "code"
                 },
                 {
                   "from": "service",
                   "to": "memory-repository",
                   "verb": "조회",
                   "payload": "findAll()",
-                  "kind": "call"
+                  "kind": "call",
+                  "effect": {
+                    "kind": "transfer",
+                    "subject": "findAll()",
+                    "before": "PostService: 재시작 뒤 전체 목록 조회 선택",
+                    "after": "PostMemoryRepository: 새 posts list의 현재 항목 반환"
+                  },
+                  "evidenceScope": "code"
                 },
                 {
                   "from": "memory-repository",
@@ -404,6 +617,13 @@ window.visualLabData = {
                   "verb": "반환",
                   "payload": "empty List<Post>",
                   "kind": "response",
+                  "effect": {
+                    "kind": "return",
+                    "subject": "empty List<Post>",
+                    "before": "PostService: 새 Repository의 목록 크기 미확인",
+                    "after": "PostService: size=0인 List<Post> 확보"
+                  },
+                  "evidenceScope": "code",
                   "concept": "초기화된 메모리 상태",
                   "check": "조회 결과가 빈 목록인지 확인합니다."
                 },
@@ -412,14 +632,28 @@ window.visualLabData = {
                   "to": "controller",
                   "verb": "반환",
                   "payload": "empty List<PostResponse>",
-                  "kind": "response"
+                  "kind": "response",
+                  "effect": {
+                    "kind": "return",
+                    "subject": "empty List<PostResponse>",
+                    "before": "PostController: 응답 목록 미구성",
+                    "after": "PostController: size=0인 List<PostResponse> 확보"
+                  },
+                  "evidenceScope": "code"
                 },
                 {
                   "from": "controller",
                   "to": "client",
                   "verb": "응답",
                   "payload": "200 OK + []",
-                  "kind": "response"
+                  "kind": "response",
+                  "effect": {
+                    "kind": "return",
+                    "subject": "200 OK + []",
+                    "before": "Client: HTTP status와 body 미확정",
+                    "after": "Client: 200 OK + []"
+                  },
+                  "evidenceScope": "runtime"
                 }
               ]
             }
@@ -650,7 +884,7 @@ window.visualLabData = {
           "message": "결과와 실패 지점을 확인합니다.",
           "messageKind": "response",
           "problem": "구현 후 실제로 어느 지점이 통과했는지 확인해야 합니다.",
-          "concept": "Verification",
+          "concept": "CRUD 실행 결과 확인",
           "action": "문서의 확인 명령이나 화면에서 결과를 검증합니다.",
           "check": "성공 흐름과 실패 흐름을 말로 설명합니다.",
           "note": "Visual Lab은 코드를 대신 완성하지 않고 확인 지점을 고정합니다.",
@@ -715,21 +949,30 @@ window.visualLabData = {
   "codePoints": [
     {
       "id": "controller-create",
-      "title": "Controller는 HTTP 요청을 Service로 넘깁니다",
+      "title": "starter의 Controller TODO에서 Service 연결을 완성합니다",
       "file": "src/main/kotlin/com/andi/rest_crud/controller/PostController.kt",
       "language": "kotlin",
-      "snippet": "@RestController\n@RequestMapping(\"/posts\")\nclass PostController(\n    private val postService: PostService\n) {\n\n    @PostMapping\n    @ResponseStatus(HttpStatus.CREATED)\n    fun create(@RequestBody request: PostCreateRequest): PostResponse {\n        return postService.create(request)\n    }\n}",
-      "explanation": "Controller는 저장 세부사항을 모르고 요청 DTO를 Service에 전달합니다.",
-      "check": "POST /posts가 어느 메서드로 들어오는지 확인합니다."
+      "snippet": "// starter TODO: 요청 DTO를 Service로 넘기고 201 응답 body를 반환합니다.\n@PostMapping\n@ResponseStatus(HttpStatus.CREATED)\nfun create(@RequestBody request: PostCreateRequest): PostResponse {\n    TODO(\"postService.create(request)를 반환하세요.\")\n}",
+      "explanation": "01-implementation에는 signature와 TODO가 있으며, 학습자는 `postService.create(request)` 반환을 연결합니다.",
+      "check": "완성 코드를 전제로 읽지 말고 이 TODO가 Service 호출로 바뀌는지 확인합니다."
     },
     {
       "id": "memory-service",
-      "title": "Service는 메모리 저장소와 응답 변환을 조립합니다",
+      "title": "starter의 Service TODO에서 생성 순서를 구현합니다",
       "file": "src/main/kotlin/com/andi/rest_crud/service/PostService.kt",
       "language": "kotlin",
-      "snippet": "fun create(request: PostCreateRequest): PostResponse {\n    val post = Post(\n        id = 0L,\n        title = request.title,\n        content = request.content,\n        author = request.author\n    )\n    val saved = postMemoryRepository.save(post)\n    return PostResponse.from(saved)\n}",
-      "explanation": "메모리 CRUD는 DB 없이 요청 값이 내부 모델과 응답으로 바뀌는 흐름을 보여줍니다.",
-      "check": "서버 재시작 후 데이터가 사라지는 이유를 설명합니다."
+      "snippet": "// starter TODO: 요청, 내부 Post, 저장, 응답 변환 순서를 완성합니다.\nfun create(request: PostCreateRequest): PostResponse {\n    TODO(\"request -> Post -> save -> PostResponse 흐름을 완성하세요.\")\n}",
+      "explanation": "01-implementation은 완성 코드가 아니라 구현 순서를 적은 TODO를 제공합니다.",
+      "check": "구현 뒤 Repository가 붙인 id가 PostResponse까지 보존되는지 확인합니다."
+    },
+    {
+      "id": "memory-repository",
+      "title": "starter의 Repository TODO에서 list 저장을 구현합니다",
+      "file": "src/main/kotlin/com/andi/rest_crud/repository/PostMemoryRepository.kt",
+      "language": "kotlin",
+      "snippet": "// starter TODO: 새 id를 붙인 Post를 process 안의 list에 저장합니다.\nfun save(post: Post): Post {\n    TODO(\"메모리 리스트에 새 Post를 저장하고 반환하세요.\")\n}",
+      "explanation": "실제 starter는 `posts`와 `nextId`를 갖지만 `save` 본문은 아직 TODO입니다.",
+      "check": "완성 뒤 새 id가 붙은 Post가 list와 반환값에 모두 남는지 확인합니다."
     }
   ],
   "concepts": [

@@ -30,29 +30,64 @@ Service는 요청을 처리하는 순서를 모읍니다.
 핵심은 Service가 "비즈니스라는 큰 단어"를 외우는 곳이 아니라는 점입니다.
 지금 단계에서는 요청, 저장, 응답 변환 순서를 한곳에서 읽게 만드는 파일이라고 이해하면 됩니다.
 
-## 4. 핵심 코드로 연결하기
+<a id="seq-01"></a>
+## 4. Sequence 01: 요청이 메모리 상태와 응답으로 바뀌는 경로
 
-이번 이론은 아래 실제 파일과 연결됩니다.
+`POST /posts`의 핵심은 파일 이름을 외우는 것이 아니라, 요청 JSON이 `PostCreateRequest -> Post -> 저장된 Post -> PostResponse`로 바뀌는 지점을 찾는 것입니다.
+각 계층은 한 번의 상태 변화만 맡으므로 어느 변환에서 값이 달라졌는지 역방향으로 좁힐 수 있습니다.
 
-- `src/main/kotlin/com/andi/rest_crud/controller/PostController.kt`: `POST /posts`, `GET /posts`, `GET /posts/{id}` 요청이 들어오는 입구입니다.
-- `src/main/kotlin/com/andi/rest_crud/service/PostService.kt`: 요청 DTO를 내부 데이터로 바꾸고 Repository와 응답 DTO를 연결합니다.
-- `src/main/kotlin/com/andi/rest_crud/repository/PostMemoryRepository.kt`: DB 대신 메모리 리스트에 저장합니다.
-- `src/main/kotlin/com/andi/rest_crud/dto/PostCreateRequest.kt`: 생성 요청 body를 받습니다.
-- `src/main/kotlin/com/andi/rest_crud/dto/PostResponse.kt`: 응답 JSON 모양을 정합니다.
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant CT as Controller
+    participant S as Service
+    participant R as Memory Repository
+    C->>CT: POST /posts와 JSON
+    CT->>S: PostCreateRequest
+    S->>R: id가 없는 Post 저장
+    R-->>S: 새 id가 있는 Post
+    S-->>CT: PostResponse
+    CT-->>C: 201 Created와 JSON
+```
 
-왜 이 코드를 보는지 먼저 정리합니다.
-REST CRUD에서 헷갈리는 문제는 “요청이 어느 파일을 지나 저장되고 응답이 되는가”입니다.
+| 단계 | 들어온 것 | 한 일 | 나간 것 또는 상태 |
+| --- | --- | --- | --- |
+| 1 | `POST /posts` JSON | Controller가 body를 DTO로 binding | `PostCreateRequest` |
+| 2 | 요청 DTO | Service가 내부 데이터로 변환 | id가 `0L`인 `Post` |
+| 3 | `Post` | Repository가 새 id를 붙여 list에 추가 | 저장된 `Post` |
+| 4 | 저장된 `Post` | Service가 응답 DTO로 변환 | `PostResponse` |
+| 5 | 응답 DTO | Controller가 생성 결과를 반환 | `201 Created`와 JSON |
 
 ```kotlin
+// starter의 Controller TODO: 이 signature에서 Service 호출과 반환을 완성합니다.
 @PostMapping
 @ResponseStatus(HttpStatus.CREATED)
 fun create(@RequestBody request: PostCreateRequest): PostResponse {
-    return postService.create(request)
+    TODO("postService.create(request)를 반환하세요.")
 }
 ```
 
-이 코드는 Controller가 요청을 받고 Service로 넘기는 문제를 해결합니다.
-Controller가 저장소를 직접 다루지 않기 때문에 요청 입구와 처리 흐름이 분리됩니다.
+요청 body는 처리되지 않은 JSON에서 Service가 다룰 수 있는 `PostCreateRequest` 상태로 바뀝니다.
+
+```kotlin
+// starter의 Service TODO: request -> Post -> save -> PostResponse 순서를 구현합니다.
+fun create(request: PostCreateRequest): PostResponse {
+    TODO("request -> Post -> save -> PostResponse 흐름을 완성하세요.")
+}
+```
+
+임시 id를 가진 요청 데이터는 저장소가 확정한 id를 포함하는 응답 데이터로 바뀝니다.
+
+```kotlin
+// starter의 Repository TODO: 새 id를 붙인 Post를 list에 남겨야 합니다.
+fun save(post: Post): Post {
+    TODO("메모리 리스트에 새 Post를 저장하고 반환하세요.")
+}
+```
+
+메모리 list에 없던 게시글이 새 id로 식별되는 저장 상태가 됩니다.
+
+[Visual Lab에서 입력 조건을 보고 경로 예측하기](./visual-lab/sequences/01/)
 
 ## 5. Repository는 왜 메모리로 시작할까?
 
@@ -72,12 +107,12 @@ Controller가 저장소를 직접 다루지 않기 때문에 요청 입구와 �
 
 이렇게 나누면 요청 형식, 내부 처리, 응답 형식을 각각 바꿔도 영향 범위를 더 쉽게 찾을 수 있습니다.
 
-## 7. 실행/테스트 결과로 확인할 것
+## 7. Swagger와 테스트에서 무엇을 확인할까?
 
 `./gradlew bootRun`으로 서버를 실행한 뒤 Swagger에서 `POST /posts`, `GET /posts`, `GET /posts/{id}`를 확인합니다.
 `./gradlew test`는 Spring context가 올라오는지와 기본 흐름이 깨지지 않았는지 확인합니다.
 
-## 8. 한계와 다음 개선 방향
+## 8. 프로세스를 다시 시작하면 상태가 사라집니다
 
 이번 저장소는 메모리 리스트를 사용하므로 서버를 재시작하면 데이터가 사라집니다.
 다음 시퀀스에서는 Repository가 DB 저장소와 연결되고, Entity 기준으로 영속 저장을 다룹니다.
