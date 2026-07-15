@@ -14,6 +14,39 @@ window.visualLabData = {
     "kind": "request-trace",
     "title": "메모리 CRUD 요청 추적기",
     "instruction": "요청 종류를 선택하고 Controller, Service, 메모리 Repository, DTO가 맡는 책임을 경로와 실행 증거로 확인하세요.",
+    "nodes": {
+      "client": {
+        "label": "Client",
+        "icon": "client",
+        "kind": "client",
+        "role": "HTTP 요청을 보내고 JSON 응답을 읽습니다.",
+        "boundary": "HTTP 외부"
+      },
+      "controller": {
+        "label": "PostController",
+        "icon": "api",
+        "kind": "api",
+        "role": "HTTP method와 path를 Service 호출에 연결합니다.",
+        "boundary": "HTTP 입구",
+        "codePointIds": ["controller-create"]
+      },
+      "service": {
+        "label": "PostService",
+        "icon": "service",
+        "kind": "service",
+        "role": "요청, 내부 모델, 저장과 응답 변환 순서를 조립합니다.",
+        "boundary": "애플리케이션 처리",
+        "codePointIds": ["memory-service"]
+      },
+      "memory-repository": {
+        "label": "PostMemoryRepository",
+        "icon": "memory",
+        "kind": "repository",
+        "role": "프로세스 안의 List를 소유하고 id 부여와 조회를 담당합니다.",
+        "boundary": "프로세스 메모리",
+        "codePointIds": ["memory-service"]
+      }
+    },
     "scenarios": [
       {
         "id": "create-in-memory",
@@ -21,6 +54,83 @@ window.visualLabData = {
         "flowId": "create-post",
         "tone": "recovered",
         "prompt": "POST body는 어디에서 내부 Post가 되고 새 id를 가진 응답으로 돌아올까요?",
+        "diagram": {
+          "caption": "Service가 요청 DTO를 내부 Post로 바꾸고, Repository가 id를 붙인 뒤 응답 DTO로 돌아옵니다.",
+          "lanes": [
+            {
+              "id": "create-round-trip",
+              "label": "생성 요청과 응답",
+              "description": "HTTP 요청에서 메모리 저장과 JSON 응답까지의 왕복입니다.",
+              "steps": [
+                {
+                  "from": "client",
+                  "to": "controller",
+                  "verb": "요청",
+                  "payload": "POST /posts + JSON body",
+                  "kind": "request",
+                  "concept": "HTTP entry",
+                  "check": "method, path, body를 확인합니다.",
+                  "codePointIds": ["controller-create"]
+                },
+                {
+                  "from": "controller",
+                  "to": "service",
+                  "verb": "호출",
+                  "payload": "create(PostCreateRequest)",
+                  "kind": "call",
+                  "concept": "Request DTO",
+                  "check": "Controller가 Repository를 직접 호출하지 않는지 확인합니다."
+                },
+                {
+                  "from": "service",
+                  "to": "service",
+                  "verb": "변환",
+                  "payload": "PostCreateRequest → Post",
+                  "kind": "transform",
+                  "concept": "외부 요청과 내부 모델 분리",
+                  "check": "요청에 없던 id가 아직 임시 값인지 확인합니다.",
+                  "codePointIds": ["memory-service"]
+                },
+                {
+                  "from": "service",
+                  "to": "memory-repository",
+                  "verb": "저장",
+                  "payload": "save(Post)",
+                  "kind": "persist",
+                  "concept": "in-process persistence",
+                  "check": "Repository가 새 id를 붙이는지 확인합니다."
+                },
+                {
+                  "from": "memory-repository",
+                  "to": "service",
+                  "verb": "반환",
+                  "payload": "saved Post { id }",
+                  "kind": "response",
+                  "concept": "저장 결과",
+                  "check": "반환된 Post에 id가 있는지 확인합니다."
+                },
+                {
+                  "from": "service",
+                  "to": "controller",
+                  "verb": "변환",
+                  "payload": "Post → PostResponse",
+                  "kind": "transform",
+                  "concept": "Response DTO",
+                  "check": "내부 Post를 그대로 응답하지 않는지 확인합니다."
+                },
+                {
+                  "from": "controller",
+                  "to": "client",
+                  "verb": "응답",
+                  "payload": "201 Created + PostResponse JSON",
+                  "kind": "response",
+                  "concept": "HTTP response",
+                  "check": "Swagger 응답 status와 id를 확인합니다."
+                }
+              ]
+            }
+          ]
+        },
         "route": [
           "Client",
           "PostController",
@@ -45,6 +155,81 @@ window.visualLabData = {
         "flowId": "read-post",
         "tone": "signal",
         "prompt": "URL의 조회 의도와 id는 어떤 책임을 지나 응답 DTO가 될까요?",
+        "diagram": {
+          "caption": "조회 조건은 Controller에서 Service로 전달되고, 메모리 목록의 Post는 응답 DTO로 변환되어 돌아옵니다.",
+          "lanes": [
+            {
+              "id": "read-round-trip",
+              "label": "전체·단건 조회",
+              "description": "URL과 id가 메모리 조회 결과와 JSON 응답으로 이어지는 흐름입니다.",
+              "steps": [
+                {
+                  "from": "client",
+                  "to": "controller",
+                  "verb": "요청",
+                  "payload": "GET /posts 또는 GET /posts/{id}",
+                  "kind": "request",
+                  "concept": "조회 URL",
+                  "check": "전체 조회와 단건 조회 path를 구분합니다."
+                },
+                {
+                  "from": "controller",
+                  "to": "service",
+                  "verb": "호출",
+                  "payload": "getAll() 또는 getById(id)",
+                  "kind": "call",
+                  "concept": "요청 위임",
+                  "check": "PathVariable id가 Service로 전달되는지 확인합니다."
+                },
+                {
+                  "from": "service",
+                  "to": "memory-repository",
+                  "verb": "조회",
+                  "payload": "findAll() 또는 findById(id)",
+                  "kind": "call",
+                  "concept": "메모리 조회",
+                  "check": "의도와 맞는 Repository method인지 확인합니다."
+                },
+                {
+                  "from": "memory-repository",
+                  "to": "service",
+                  "verb": "반환",
+                  "payload": "Post 또는 List<Post>",
+                  "kind": "response",
+                  "concept": "내부 모델",
+                  "check": "메모리 목록에서 찾은 결과를 확인합니다."
+                },
+                {
+                  "from": "service",
+                  "to": "service",
+                  "verb": "변환",
+                  "payload": "Post → PostResponse",
+                  "kind": "transform",
+                  "concept": "응답 경계",
+                  "check": "각 Post가 Response DTO로 바뀌는지 확인합니다."
+                },
+                {
+                  "from": "service",
+                  "to": "controller",
+                  "verb": "반환",
+                  "payload": "PostResponse 또는 List<PostResponse>",
+                  "kind": "response",
+                  "concept": "Service result",
+                  "check": "Controller가 결과 모양을 다시 조립하지 않는지 확인합니다."
+                },
+                {
+                  "from": "controller",
+                  "to": "client",
+                  "verb": "응답",
+                  "payload": "200 OK + JSON",
+                  "kind": "response",
+                  "concept": "HTTP response",
+                  "check": "Swagger에서 전체·단건 응답을 확인합니다."
+                }
+              ]
+            }
+          ]
+        },
         "route": [
           "Client",
           "PostController",
@@ -68,6 +253,105 @@ window.visualLabData = {
         "flowId": "create-post",
         "tone": "warning",
         "prompt": "저장에 성공했던 게시글이 서버 재시작 뒤 사라지는 이유는 무엇일까요?",
+        "diagram": {
+          "caption": "Repository가 가진 List는 애플리케이션 프로세스 안에 있으므로 재시작하면 새 빈 목록으로 만들어집니다.",
+          "lanes": [
+            {
+              "id": "before-restart",
+              "label": "재시작 전",
+              "description": "프로세스 안의 Repository 목록에 게시글이 저장된 상태입니다.",
+              "steps": [
+                {
+                  "from": "client",
+                  "to": "controller",
+                  "verb": "요청",
+                  "payload": "POST /posts + JSON",
+                  "kind": "request"
+                },
+                {
+                  "from": "controller",
+                  "to": "service",
+                  "verb": "호출",
+                  "payload": "create(PostCreateRequest)",
+                  "kind": "call"
+                },
+                {
+                  "from": "service",
+                  "to": "memory-repository",
+                  "verb": "저장",
+                  "payload": "Post",
+                  "kind": "persist",
+                  "concept": "프로세스 메모리",
+                  "check": "재시작 전 목록에 Post가 있는지 확인합니다."
+                },
+                {
+                  "from": "memory-repository",
+                  "to": "service",
+                  "verb": "반환",
+                  "payload": "saved Post { id }",
+                  "kind": "response"
+                }
+              ]
+            },
+            {
+              "id": "after-restart",
+              "label": "재시작 후",
+              "description": "새 프로세스에서 Repository의 List가 다시 초기화된 상태입니다.",
+              "steps": [
+                {
+                  "from": "client",
+                  "to": "controller",
+                  "verb": "다시 조회",
+                  "payload": "GET /posts",
+                  "kind": "request"
+                },
+                {
+                  "from": "controller",
+                  "to": "service",
+                  "verb": "호출",
+                  "payload": "getAll()",
+                  "kind": "call"
+                },
+                {
+                  "from": "service",
+                  "to": "memory-repository",
+                  "verb": "조회",
+                  "payload": "findAll()",
+                  "kind": "call"
+                },
+                {
+                  "from": "memory-repository",
+                  "to": "service",
+                  "verb": "반환",
+                  "payload": "empty List<Post>",
+                  "kind": "response",
+                  "concept": "초기화된 메모리 상태",
+                  "check": "조회 결과가 빈 목록인지 확인합니다."
+                },
+                {
+                  "from": "service",
+                  "to": "controller",
+                  "verb": "반환",
+                  "payload": "empty List<PostResponse>",
+                  "kind": "response"
+                },
+                {
+                  "from": "controller",
+                  "to": "client",
+                  "verb": "응답",
+                  "payload": "200 OK + []",
+                  "kind": "response"
+                }
+              ]
+            }
+          ],
+          "notReached": [
+            {
+              "label": "영속 저장소",
+              "reason": "이 시퀀스는 DB를 사용하지 않아 프로세스 밖에 데이터를 남기지 않습니다."
+            }
+          ]
+        },
         "route": [
           "Client",
           "PostController",
