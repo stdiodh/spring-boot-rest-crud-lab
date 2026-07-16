@@ -54,6 +54,7 @@ window.visualLabData = {
         "icon": "client",
         "kind": "client",
         "role": "HTTP 요청을 보내고 JSON 응답을 읽습니다.",
+        "systemLayer": "outside",
         "boundary": "HTTP 외부"
       },
       "controller": {
@@ -61,6 +62,7 @@ window.visualLabData = {
         "icon": "api",
         "kind": "api",
         "role": "HTTP method와 path를 Service 호출에 연결합니다.",
+        "systemLayer": "interface",
         "boundary": "HTTP 입구",
         "codePointIds": ["controller-create"]
       },
@@ -69,6 +71,7 @@ window.visualLabData = {
         "icon": "service",
         "kind": "service",
         "role": "요청, 내부 모델, 저장과 응답 변환 순서를 조립합니다.",
+        "systemLayer": "application",
         "boundary": "애플리케이션 처리",
         "codePointIds": ["memory-service"]
       },
@@ -77,6 +80,7 @@ window.visualLabData = {
         "icon": "service",
         "kind": "service",
         "role": "애플리케이션과 그 안의 Repository 인스턴스를 시작하고 종료합니다.",
+        "systemLayer": "runtime",
         "boundary": "프로세스 수명"
       },
       "memory-repository": {
@@ -84,6 +88,7 @@ window.visualLabData = {
         "icon": "memory",
         "kind": "repository",
         "role": "프로세스 안의 List를 소유하고 id 부여와 조회를 담당합니다.",
+        "systemLayer": "resource",
         "boundary": "프로세스 메모리",
         "codePointIds": ["memory-repository"]
       }

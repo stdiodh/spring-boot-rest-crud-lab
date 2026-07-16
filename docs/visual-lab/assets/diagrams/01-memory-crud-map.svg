@@ -1,27 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" role="img" aria-labelledby="seq01-title seq01-desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" role="img" aria-labelledby="seq01-title seq01-desc">
   <title id="seq01-title">01 메모리 CRUD 책임 지도</title>
-  <desc id="seq01-desc">Client, Controller, Service, 프로세스 메모리의 요청 책임과 재시작 시 초기화를 나타낸 지도</desc>
+  <desc id="seq01-desc">시스템 밖 Client 요청이 입구·출구 Controller와 서비스·정책 Service를 지나 상태·데이터 Memory에 도달하고, 응답과 재시작 초기화 조건을 확인하는 지도</desc>
   <metadata>Source: A&amp;I Backend Visual Lab; License: project-local educational asset; redistribution follows repository terms.</metadata>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#2955E4"/></marker>
-    <marker id="arrow-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#176F72"/></marker>
-    <style>.frame{fill:#fff;stroke:#6f82b8;stroke-width:2}.node{fill:#fff;stroke:#6f82b8;stroke-width:2}.soft{fill:#ecfbfa;stroke:#176f72;stroke-width:2}.warning{fill:#eef4ff;stroke:#2955e4;stroke-width:2}.boundary{fill:#eaf0fb;stroke:#6f82b8;stroke-width:2;stroke-dasharray:7 5}.boundary-strong{fill:#ecfbfa;stroke:#176f72;stroke-width:3}.arrow{fill:none;stroke:#2955e4;stroke-width:3;marker-end:url(#arrow)}.return{fill:none;stroke:#176f72;stroke-width:3;marker-end:url(#arrow-teal)}.stop{fill:none;stroke:#2955e4;stroke-width:2;stroke-dasharray:6 4}.divider{stroke:#c9d6f3;stroke-width:2}.title{fill:#111b3f;font:700 26px system-ui,-apple-system,sans-serif;text-anchor:middle}.copy{fill:#4b587c;font:600 24px system-ui,-apple-system,sans-serif;text-anchor:middle}.label{fill:#0c2691;font:800 24px system-ui,-apple-system,sans-serif}.teal{fill:#176f72}</style>
+    <marker id="return-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#176F72"/></marker>
+    <style>
+      text{font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;fill:#111B3F}
+      .frame{fill:#FFFFFF;stroke:#6F82B8;stroke-width:2}
+      .node{stroke-width:2.5}
+      .layer-outside{fill:#F1F5F9;stroke:#5B677A}
+      .layer-interface{fill:#E6F4F7;stroke:#0E7490}
+      .layer-application{fill:#F2EDFF;stroke:#6D43A8}
+      .layer-resource{fill:#EAF5EE;stroke:#2C7352}
+      .layer-integration{fill:#FFF4D6;stroke:#926000}
+      .layer-runtime{fill:#EEF2F7;stroke:#52627A}
+      [data-layer="outside"] .layer{fill:#5B677A}
+      [data-layer="resource"] .layer{fill:#2C7352}
+      .flow{fill:none;stroke:#2955E4;stroke-width:3;marker-end:url(#arrow)}
+      .return{fill:none;stroke:#176F72;stroke-width:3;marker-end:url(#return-arrow)}
+      .state{fill:#F6F7FA;stroke:#64748B;stroke-width:2;stroke-dasharray:7 5}
+      .group{font-size:24px;font-weight:850;fill:#0C2691}
+      .layer{font-size:24px;font-weight:800;fill:#4B587C;text-anchor:middle}
+      .name{font-size:25px;font-weight:800;text-anchor:middle}
+      .body{font-size:24px;font-weight:650;fill:#4B587C;text-anchor:middle}
+      .state-copy{font-size:24px;font-weight:800;text-anchor:middle}
+    </style>
   </defs>
-  <rect width="720" height="300" fill="#F8F9FB"/>
+  <rect width="720" height="340" fill="#F8F9FB"/>
+  <rect x="20" y="20" width="680" height="300" rx="18" class="frame"/>
+  <text x="34" y="59" class="group">요청 책임이 이동하는 위치</text>
 
-  <rect x="20" y="20" width="680" height="260" rx="18" class="frame"/>
-  <text x="42" y="58" class="label">요청과 응답 책임</text>
-  <rect x="38" y="90" width="120" height="64" rx="10" class="node"/><text x="98" y="130" class="title">Client</text>
-  <path d="M158 122h40" class="arrow"/>
-  <rect x="198" y="90" width="150" height="64" rx="10" class="node"/><text x="273" y="130" class="title">Controller</text>
-  <path d="M348 122h38" class="arrow"/>
-  <rect x="386" y="90" width="120" height="64" rx="10" class="node"/><text x="446" y="130" class="title">Service</text>
-  <path d="M506 122h38" class="arrow"/>
-  <rect x="544" y="82" width="138" height="80" rx="10" class="soft"/>
-  <text x="613" y="116" class="title">Memory</text>
-  <text x="613" y="145" class="copy">List + id</text>
-  <path d="M613 178v42H98v-48" class="return"/>
-  <text x="356" y="214" class="copy teal">Response DTO</text>
-  <rect x="236" y="232" width="240" height="38" rx="9" class="warning"/>
-  <text x="356" y="259" class="title">재시작 → 초기화</text>
+  <g data-layer="outside">
+    <rect x="30" y="82" width="130" height="90" rx="10" class="node layer-outside"/>
+    <text x="95" y="108" class="layer">시스템 밖</text>
+    <text x="95" y="146" class="name">Client</text>
+  </g>
+  <path d="M160 127h25" class="flow"/>
+  <g data-layer="interface">
+    <rect x="190" y="82" width="150" height="90" rx="10" class="node layer-interface"/>
+    <text x="265" y="108" class="layer">입구·출구</text>
+    <text x="265" y="146" class="name">Controller</text>
+  </g>
+  <path d="M340 127h25" class="flow"/>
+  <g data-layer="application">
+    <rect x="370" y="82" width="130" height="90" rx="10" class="node layer-application"/>
+    <text x="435" y="108" class="layer">서비스·정책</text>
+    <text x="435" y="146" class="name">Service</text>
+  </g>
+  <path d="M500 127h25" class="flow"/>
+  <g data-layer="resource">
+    <rect x="530" y="76" width="160" height="102" rx="10" class="node layer-resource"/>
+    <text x="610" y="102" class="layer">상태·데이터</text>
+    <text x="610" y="134" class="name">Memory</text>
+    <text x="610" y="162" class="body">List + id</text>
+  </g>
+
+  <path d="M610 190v30H95v-36" class="return"/>
+  <text x="353" y="213" class="body">Response DTO · 호출자에게 반환</text>
+  <g data-semantic="state">
+    <rect x="150" y="248" width="420" height="52" rx="9" class="state"/>
+    <text x="360" y="281" class="state-copy">process 재시작 → Memory 초기화</text>
+  </g>
 </svg>
