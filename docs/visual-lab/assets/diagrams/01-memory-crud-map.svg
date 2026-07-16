@@ -20,11 +20,11 @@
       .flow{fill:none;stroke:#2955E4;stroke-width:3;marker-end:url(#arrow)}
       .return{fill:none;stroke:#176F72;stroke-width:3;marker-end:url(#return-arrow)}
       .state{fill:#F6F7FA;stroke:#64748B;stroke-width:2;stroke-dasharray:7 5}
-      .group{font-size:24px;font-weight:850;fill:#0C2691}
-      .layer{font-size:24px;font-weight:800;fill:#4B587C;text-anchor:middle}
-      .name{font-size:25px;font-weight:800;text-anchor:middle}
-      .body{font-size:24px;font-weight:650;fill:#4B587C;text-anchor:middle}
-      .state-copy{font-size:24px;font-weight:800;text-anchor:middle}
+      .group{font-size:27px;font-weight:850;fill:#0C2691}
+      .layer{font-size:25px;font-weight:800;fill:#4B587C;text-anchor:middle}
+      .name{font-size:28px;font-weight:800;text-anchor:middle}
+      .body{font-size:25px;font-weight:650;fill:#4B587C;text-anchor:middle}
+      .state-copy{font-size:25px;font-weight:800;text-anchor:middle}
     </style>
   </defs>
   <rect width="720" height="340" fill="#F8F9FB"/>
@@ -32,23 +32,23 @@
   <text x="34" y="59" class="group">요청 책임이 이동하는 위치</text>
 
   <g data-layer="outside">
-    <rect x="30" y="82" width="130" height="90" rx="10" class="node layer-outside"/>
+    <rect x="25" y="82" width="140" height="90" rx="10" class="node layer-outside"/>
     <text x="95" y="108" class="layer">시스템 밖</text>
     <text x="95" y="146" class="name">Client</text>
   </g>
-  <path d="M160 127h25" class="flow"/>
+  <path d="M165 127h15" class="flow"/>
   <g data-layer="interface">
-    <rect x="190" y="82" width="150" height="90" rx="10" class="node layer-interface"/>
+    <rect x="185" y="82" width="160" height="90" rx="10" class="node layer-interface"/>
     <text x="265" y="108" class="layer">입구·출구</text>
     <text x="265" y="146" class="name">Controller</text>
   </g>
-  <path d="M340 127h25" class="flow"/>
+  <path d="M345 127h15" class="flow"/>
   <g data-layer="application">
-    <rect x="370" y="82" width="130" height="90" rx="10" class="node layer-application"/>
-    <text x="435" y="108" class="layer">서비스·정책</text>
-    <text x="435" y="146" class="name">Service</text>
+    <rect x="365" y="82" width="145" height="90" rx="10" class="node layer-application"/>
+    <text x="437.5" y="108" class="layer">서비스·정책</text>
+    <text x="437.5" y="146" class="name">Service</text>
   </g>
-  <path d="M500 127h25" class="flow"/>
+  <path d="M510 127h15" class="flow"/>
   <g data-layer="resource">
     <rect x="530" y="76" width="160" height="102" rx="10" class="node layer-resource"/>
     <text x="610" y="102" class="layer">상태·데이터</text>
@@ -56,10 +56,10 @@
     <text x="610" y="162" class="body">List + id</text>
   </g>
 
-  <path d="M610 190v30H95v-36" class="return"/>
-  <text x="353" y="213" class="body">Response DTO · 호출자에게 반환</text>
+  <path d="M610 190v40H95v-46" class="return"/>
+  <text x="353" y="212" class="body">Response DTO 반환</text>
   <g data-semantic="state">
-    <rect x="150" y="248" width="420" height="52" rx="9" class="state"/>
-    <text x="360" y="281" class="state-copy">process 재시작 → Memory 초기화</text>
+    <rect x="150" y="252" width="420" height="52" rx="9" class="state"/>
+    <text x="360" y="285" class="state-copy">process 재시작 → Memory 초기화</text>
   </g>
 </svg>

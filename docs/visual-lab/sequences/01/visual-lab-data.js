@@ -99,15 +99,15 @@ window.visualLabData = {
         "label": "게시글 생성",
         "flowId": "create-post",
         "tone": "recovered",
-        "prompt": "POST body는 어디에서 내부 Post가 되고 새 id를 가진 응답으로 돌아올까요?",
-        "observationTitle": "요청 JSON은 어디서 새 id를 가진 응답으로 바뀌는가?",
+        "prompt": "POST /posts JSON에는 id가 없고 저장 응답에는 새 id가 필요합니다.",
+        "observationTitle": "요청 JSON에 새 id가 생기는 지점",
         "reflection": {
-          "prompt": "생성 흐름에서 Controller, Service, Repository의 상태 변화 규칙을 한 문장으로 적어 보세요.",
+          "prompt": "id가 생기는 지점을 중심으로 세 계층의 역할을 자기 말로 이어 보세요.",
           "hint": "binding, 내부 데이터 변환, id 부여, 응답 변환을 순서대로 연결하세요."
         },
         "theoryRef": "../../../theory.md#seq-01",
         "prediction": {
-          "prompt": "POST body가 새 id를 가진 응답이 되기까지 책임을 어떻게 나누는 편이 맞을까요?",
+          "prompt": "HTTP 입구, 변환 순서, id 부여를 어느 책임에 나눌까요?",
           "options": [
             {
               "id": "controller-direct",
@@ -119,15 +119,15 @@ window.visualLabData = {
             }
           ],
           "answer": "service-repository",
-          "explanation": "Controller는 HTTP 입구를 지키고 Service와 Repository가 처리·보관 책임을 나눕니다."
+          "explanation": "요청 mapping, 처리 순서, 저장 상태를 분리해야 변화가 생긴 계층을 찾을 수 있습니다."
         },
         "diagram": {
-          "caption": "Service가 요청 DTO를 내부 Post로 바꾸고, Repository가 id를 붙인 뒤 응답 DTO로 돌아옵니다.",
+          "caption": "Client → Controller → Service에서 요청을 변환하고 Repository가 id를 붙여 응답 DTO로 돌려줍니다.",
           "lanes": [
             {
               "id": "create-round-trip",
               "label": "생성 요청과 응답",
-              "description": "HTTP 요청에서 메모리 저장과 JSON 응답까지의 왕복입니다.",
+              "description": "한 생성 요청의 HTTP 입구, 메모리 저장, 응답 반환을 잇습니다.",
               "steps": [
                 {
                   "from": "client",
@@ -266,23 +266,23 @@ window.visualLabData = {
           { "label": "저장 결과", "value": "id가 붙은 Post", "tone": "recovered" },
           { "label": "Response", "value": "201 Created + JSON" }
         ],
-        "evidence": "Swagger 생성 응답과 PostMemoryRepository.save(...)가 붙인 id를 함께 확인합니다.",
-        "outcome": "Controller는 입구를 지키고 Service가 DTO·내부 모델·저장소·응답 변환을 연결합니다."
+        "evidence": "Swagger의 201 응답과 PostMemoryRepository.save(...)가 붙인 id를 대조합니다. 재시작 뒤 보존은 증명하지 않습니다.",
+        "outcome": "새 id는 요청이 아니라 Repository의 메모리 저장 결과에서 확정됩니다."
       },
       {
         "id": "read-in-memory",
         "label": "전체·단건 조회",
         "flowId": "read-post",
         "tone": "signal",
-        "prompt": "URL의 조회 의도와 id는 어떤 책임을 지나 응답 DTO가 될까요?",
-        "observationTitle": "조회 의도와 id가 어떤 호출을 거쳐 응답 DTO가 되는가?",
+        "prompt": "GET /posts 또는 GET /posts/{id}가 Controller에 들어옵니다.",
+        "observationTitle": "조회 조건이 응답 DTO가 되는 경로",
         "reflection": {
           "prompt": "전체 조회와 단건 조회가 같은 계층을 지나면서 달라지는 입력 조건은 무엇인가요?",
           "hint": "`findAll()`과 `findById(id)`가 선택되는 원인을 URL의 id 유무에서 찾으세요."
         },
         "theoryRef": "../../../theory.md#seq-01",
         "prediction": {
-          "prompt": "메모리에서 찾은 내부 Post를 API 응답으로 보낼 때 무엇을 거칠까요?",
+          "prompt": "메모리에서 찾은 Post를 외부 응답으로 보낼 때 무엇을 거칠까요?",
           "options": [
             {
               "id": "return-model",
@@ -297,12 +297,12 @@ window.visualLabData = {
           "explanation": "외부 응답 계약과 내부 모델을 분리하기 위해 조회 결과도 Response DTO로 변환합니다."
         },
         "diagram": {
-          "caption": "조회 조건은 Controller에서 Service로 전달되고, 메모리 목록의 Post는 응답 DTO로 변환되어 돌아옵니다.",
+          "caption": "Client의 조회 조건이 Controller → Service → Memory Repository를 지나 PostResponse로 돌아옵니다.",
           "lanes": [
             {
               "id": "read-round-trip",
               "label": "전체·단건 조회",
-              "description": "URL과 id가 메모리 조회 결과와 JSON 응답으로 이어지는 흐름입니다.",
+              "description": "전체 조회와 id 단건 조회가 같은 응답 변환 책임을 공유합니다.",
               "steps": [
                 {
                   "from": "client",
@@ -434,23 +434,23 @@ window.visualLabData = {
           { "label": "Repository", "value": "findAll / findById" },
           { "label": "Response", "value": "PostResponse 또는 목록" }
         ],
-        "evidence": "Swagger의 전체·단건 조회 결과와 Service의 PostResponse 변환을 비교합니다.",
-        "outcome": "조회 결과를 내부 Post 그대로 내보내지 않고 API 응답 DTO로 정리합니다."
+        "evidence": "Swagger의 전체·단건 응답과 Service의 PostResponse 변환 코드를 대조합니다.",
+        "outcome": "전체와 단건 조회는 선택 조건만 다르고 내부 Post는 모두 API 응답 DTO로 변환됩니다."
       },
       {
         "id": "restart-memory",
         "label": "서버 재시작",
         "flowId": "create-post",
         "tone": "warning",
-        "prompt": "저장에 성공했던 게시글이 서버 재시작 뒤 사라지는 이유는 무엇일까요?",
-        "observationTitle": "201로 저장한 게시글이 재시작 뒤 빈 목록이 되는가?",
+        "prompt": "201로 만든 게시글이 애플리케이션의 메모리 List에만 있습니다.",
+        "observationTitle": "프로세스 재시작 뒤 메모리 상태",
         "reflection": {
-          "prompt": "서버 재시작이 메모리 게시글을 없애는 인과 규칙을 설명해 보세요.",
+          "prompt": "프로세스와 메모리 저장소의 수명을 자기 말로 연결해 보세요.",
           "hint": "list의 수명이 프로세스와 같고 외부 저장소에는 기록되지 않았다는 점을 연결하세요."
         },
         "theoryRef": "../../../theory.md#seq-01",
         "prediction": {
-          "prompt": "메모리에 저장한 게시글은 서버 재시작 뒤 어떻게 될까요?",
+          "prompt": "이 서버를 재시작하면 저장한 게시글은 어떻게 될까요?",
           "options": [
             {
               "id": "remains",
@@ -462,10 +462,10 @@ window.visualLabData = {
             }
           ],
           "answer": "cleared",
-          "explanation": "List는 실행 중인 프로세스 안에 있으므로 프로세스가 끝나면 저장 상태도 사라집니다."
+          "explanation": "저장 위치가 프로세스 메모리인지 외부 저장소인지가 수명을 결정합니다."
         },
         "diagram": {
-          "caption": "Repository가 가진 List는 애플리케이션 프로세스 안에 있으므로 재시작하면 새 빈 목록으로 만들어집니다.",
+          "caption": "기존 프로세스가 끝나며 List가 사라지고 새 프로세스는 빈 Repository로 시작합니다.",
           "lanes": [
             {
               "id": "before-restart",
@@ -684,8 +684,8 @@ window.visualLabData = {
           { "label": "재시작 후", "value": "빈 목록", "tone": "warning" },
           { "label": "다음 질문", "value": "프로세스 밖 영속 저장소" }
         ],
-        "evidence": "서버를 다시 실행한 뒤 GET /posts 결과가 비어 있는지 확인합니다.",
-        "outcome": "메모리 컬렉션은 프로세스 수명과 함께 사라지므로 다음 시퀀스에서 DB 저장으로 교체해야 합니다."
+        "evidence": "서버 재시작 전후 GET /posts를 비교합니다. 외부 DB나 파일 저장은 이 시퀀스에 없습니다.",
+        "outcome": "프로세스가 교체되면 그 안의 List도 새로 만들어져 이전 게시글은 남지 않습니다."
       }
     ]
   },
